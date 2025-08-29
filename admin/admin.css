@@ -8,7 +8,7 @@ body {
 
 /* --- Navigation Bar --- */
 nav {
-    background-color: #101820;
+    background-color: rgb(2, 2, 64);
     padding: 15px 30px;
     box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -21,7 +21,7 @@ nav {
 }
 
 .logo-img {
-    height: 40px; /* Adjust height as needed */
+    height: 70px; /* Adjust height as needed */
     margin-right: 15px;
 }
 
