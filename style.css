@@ -53,6 +53,7 @@ body {
 
 /* Hero Section */
 .hero {
+  height:700px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -90,7 +91,8 @@ body {
 }
 
 .hero-img img {
-  max-width: 400px;
+  height:400px;
+  max-width: 600px;
   border-radius: 15px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.2);
 }
