@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Documents - SafeID</title>
+  <link rel="stylesheet" href="upload.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">SafeID</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="upload.html" class="active">Upload</a></li>
+    </ul>
+  </nav>
+
+  <section class="upload-section">
+    <h1>Upload Your Documents</h1>
+    <p>Securely upload your important documents. They will be linked to your decentralized identity and safely encrypted.</p>
+
+    <form id="uploadForm">
+      <label for="docType">Document Type:</label>
+      <select id="docType" name="docType" required>
+        <option value="">--Select Document--</option>
+        <option value="id">Identity Card</option>
+        <option value="passport">Passport</option>
+        <option value="certificate">Certificate</option>
+        <option value="others">Others</option>
+      </select>
+
+      <label for="fileUpload">Choose File:</label>
+      <input type="file" id="fileUpload" name="fileUpload" accept=".pdf,.jpg,.jpeg,.png" required>
+
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="uploadStatus"></div>
+  </section>
+
+  <script src="upload.js"></script>
+</body>
+</html>
