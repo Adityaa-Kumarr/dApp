@@ -8,7 +8,7 @@ body {
 
 /* --- Navigation Bar --- */
 nav {
-    background-color: #6A89A7;
+    background-color: #f9f9f9;
     padding: 15px 30px;
     box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
     display: flex;
