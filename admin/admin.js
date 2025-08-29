@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Redirect to a dashboard after a short delay
             setTimeout(() => {
                 // Replace 'admin-dashboard.html' with your actual dashboard page
-                window.location.href = 'admin-dashboard.html';
+                window.location.href = './createid/createid.html';
             }, 1500);
 
         } else {
