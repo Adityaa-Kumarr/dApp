@@ -6,12 +6,15 @@ body {
 }
 
 .navbar {
-  background: #1d2671;
+  background: rgb(2, 1, 52);
   color: white;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.navbar .logo-img{
+  height:40px;
 }
 
 .nav-links {
@@ -71,7 +74,7 @@ button {
 }
 
 button {
-  background: #1d2671;
+  background: rgb(13, 2, 81);
   color: white;
   cursor: pointer;
   border: none;
@@ -79,7 +82,8 @@ button {
 }
 
 button:hover {
-  background: #c33764;
+  background: rgb(178, 229, 245);
+  color:black;
 }
 
 #uploadStatus {
