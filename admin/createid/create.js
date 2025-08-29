@@ -1,75 +1,64 @@
-// --- CONFIGURATION ---
-// 🚨 CRITICAL: You have shared your secret key again.
-// Please go to Pinata, REVOKE this key, and create a new one.
-// Never share secret keys publicly.
+// --- IMPORTS ---
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.js";
+import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
+
 const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiYWQxNDljODBjYzNkYTFhOTQ2YWMiLCJzY29wZWRLZXlTZWNyZXQiOiJiYjUzNDE0MjZmZGU3OWM5MjM0ZDBhMWFhY2NjOTM3NWMwYTFiZjM1YjY3MmUxNWNkYzMxOGU2MzIwMDg4MDBiIiwiZXhwIjoxNzg4MDMzMDA4fQ.jKhwK7R6upvEUB2dLo8HzW-LZtIlOG801IZX87DKUJE';
 const CONTRACT_ADDRESS = '0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B';
 const CONTRACT_ABI = [
     { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getIdentity", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" },
     { "inputs": [{ "internalType": "string", "name": "_cid", "type": "string" }], "name": "setIdentity", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ];
-// --- NEW: Add your Coinbase App ID ---
-const COINBASE_APP_ID = '8c1d6cd1-9fe8-4011-88f7-30b7db626749';
+const COINBASE_APP_ID = 'd1a2b1fb-a597-4fd9-87db-0b4993b4bec3';
 
 
 // --- STATE MANAGEMENT ---
 let provider;
 let signer;
 let capturedImageBlob = null;
-let coinbasePay = null; // To hold the SDK instance
+let coinbasePay = null;
 
 
 // --- DOM ELEMENT REFERENCES ---
-let connectWalletBtn, form, submitBtn, video, canvas, captureBtn, photoPreview, modal, modalSpinner, modalIcon, modalTitle, modalText, closeModalBtn, recaptureBtn;
-
-function initializeDOMElements() {
-    connectWalletBtn = document.getElementById('connect-wallet-btn');
-    form = document.getElementById('create-id-form');
-    submitBtn = document.getElementById('submit-btn');
-    video = document.getElementById('camera-stream');
-    canvas = document.getElementById('photo-canvas');
-    captureBtn = document.getElementById('capture-btn');
-    photoPreview = document.getElementById('photo-preview');
-    modal = document.getElementById('fingerprint-modal');
-    modalSpinner = document.getElementById('modal-spinner');
-    modalIcon = document.getElementById('modal-icon');
-    modalTitle = document.getElementById('modal-title');
-    modalText = document.getElementById('modal-text');
-    closeModalBtn = document.getElementById('close-modal-btn');
-    recaptureBtn = document.getElementById('recapture-btn');
-}
+const connectWalletBtn = document.getElementById('connect-wallet-btn');
+const form = document.getElementById('create-id-form');
+const submitBtn = document.getElementById('submit-btn');
+const video = document.getElementById('camera-stream');
+const canvas = document.getElementById('photo-canvas');
+const captureBtn = document.getElementById('capture-btn');
+const photoPreview = document.getElementById('photo-preview');
+const modal = document.getElementById('fingerprint-modal');
+const modalSpinner = document.getElementById('modal-spinner');
+const modalIcon = document.getElementById('modal-icon');
+const modalTitle = document.getElementById('modal-title');
+const modalText = document.getElementById('modal-text');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const recaptureBtn = document.getElementById('recapture-btn');
 
 
 // --- FUNCTIONS ---
 
-// 1. Wallet Connection (UPDATED FOR COINBASE EMBEDDED WALLET)
+// 1. Wallet Connection
 function initializeCoinbaseSDK() {
     if (window.coinbasePay) {
         coinbasePay = new window.coinbasePay({
             appId: COINBASE_APP_ID,
-            // This function is called when the user successfully connects
             onSuccess: (response) => {
                 const { address, provider: coinbaseProvider } = response;
-                
-                // Wrap the Coinbase provider with ethers.js
                 provider = new ethers.providers.Web3Provider(coinbaseProvider);
                 signer = provider.getSigner();
-
-                // Update UI to show the connected address
                 connectWalletBtn.textContent = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
                 submitBtn.disabled = false;
                 console.log("Embedded wallet connected:", address);
             },
-            onExit: () => {
-                console.log("User exited the wallet connection flow.");
-            },
+            onExit: () => console.log("User exited the wallet connection flow."),
             onError: (error) => {
                 console.error("Failed to connect wallet:", error);
                 alert("Failed to connect wallet.");
             }
         });
     } else {
-        console.error('Coinbase Pay SDK not found. Make sure the script tag is in your HTML.');
+        // This should not happen with the new check, but is good for debugging
+        console.error('Coinbase Pay SDK not found.');
     }
 }
 
@@ -78,13 +67,10 @@ async function connectWallet() {
         alert('Coinbase SDK not initialized.');
         return;
     }
-    // This opens the Coinbase modal for the user to sign in or create a wallet
-    coinbasePay.open({
-        experience: 'embedded',
-    });
+    coinbasePay.open({ experience: 'embedded' });
 }
 
-// 2. Camera Logic (No changes needed)
+// 2. Camera Logic (No changes)
 async function startCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -105,9 +91,7 @@ function takePicture() {
     video.style.display = 'none';
     captureBtn.style.display = 'none';
     recaptureBtn.style.display = 'inline-block';
-    canvas.toBlob(blob => {
-        capturedImageBlob = blob;
-    }, 'image/jpeg');
+    canvas.toBlob(blob => { capturedImageBlob = blob; }, 'image/jpeg');
 }
 
 function recapturePhoto() {
@@ -118,7 +102,7 @@ function recapturePhoto() {
     capturedImageBlob = null;
 }
 
-// 3. Pinata IPFS Upload Logic (No changes needed)
+// 3. Pinata IPFS Upload Logic (No changes)
 async function storeOnPinata(formData, imageBlob) {
     if (!imageBlob) throw new Error("No image captured to upload.");
     const identityData = { name: formData.get('name'), phone: formData.get('phone'), email: formData.get('email'), nationality: formData.get('nationality'), createdAt: new Date().toISOString() };
@@ -137,7 +121,7 @@ async function storeOnPinata(formData, imageBlob) {
     }
 }
 
-// 4. Smart Contract Interaction (No changes needed)
+// 4. Smart Contract Interaction (No changes)
 async function storeCidOnBlockchain(cid) {
     if (!signer) throw new Error("Wallet not connected.");
     try {
@@ -151,7 +135,7 @@ async function storeCidOnBlockchain(cid) {
     }
 }
 
-// 5. Form Submission Handler (No changes needed)
+// 5. Form Submission Handler (No changes)
 async function handleFormSubmit(event) {
     event.preventDefault();
     if (!capturedImageBlob) {
@@ -172,7 +156,7 @@ async function handleFormSubmit(event) {
     }
 }
 
-// 6. Modal UI Helper (No changes needed)
+// 6. Modal UI Helper (No changes)
 function showModal(type, title, text) {
     modal.style.display = 'flex';
     modalTitle.textContent = title;
@@ -186,19 +170,46 @@ function showModal(type, title, text) {
     else modalIcon.classList.add('fa-fingerprint');
 }
 
+
 // --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    initializeDOMElements();
-    initializeCoinbaseSDK(); // <-- Initialize the SDK on page load
+// NEW: This function contains all the setup logic.
+function initializeApp() {
+    initializeCoinbaseSDK();
     startCamera();
     
     // Attach event listeners
     connectWalletBtn.addEventListener('click', connectWallet);
     captureBtn.addEventListener('click', takePicture);
     recaptureBtn.addEventListener('click', recapturePhoto);
-
     form.addEventListener('submit', handleFormSubmit);
     closeModalBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
+}
+
+// NEW: This function waits for the Coinbase SDK to be loaded before starting the app.
+function waitForSDK() {
+    let attempts = 0;
+    const maxAttempts = 20; // Try for 10 seconds
+
+    const interval = setInterval(() => {
+        // Check if the SDK is available on the window object
+        if (window.coinbasePay) {
+            clearInterval(interval);
+            initializeApp(); // Start the app
+        } else {
+            attempts++;
+            if (attempts > maxAttempts) {
+                clearInterval(interval);
+                console.error("Failed to load Coinbase SDK after 10 seconds.");
+                alert("Could not load wallet components. Please check your internet connection and refresh the page.");
+            }
+        }
+    }, 500); // Check every 500ms
+}
+
+// Start the process when the DOM is ready.
+document.addEventListener('DOMContentLoaded', () => {
+    waitForSDK();
 });
+
