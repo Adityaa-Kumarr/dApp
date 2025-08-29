@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Set a timeout to redirect to the upload page after a few seconds
             setTimeout(() => {
-                window.location.href = 'upload/upload.html';
+                window.location.href = './admin/upload/upload.html';
             }, 3000); // Redirect after 3 seconds
         } else {
             // If form is invalid, trigger browser's validation messages
