@@ -29,8 +29,13 @@ body {
   font-weight: 500;
 }
 
-.nav-links a.active {
-  border-bottom: 2px solid #ffcc00;
+.nav-links a:hover{
+  height:20px;
+  border:1px solid rgb(4, 26, 74);
+  
+  background: lightblue;
+  color: black;
+  
 }
 
 .upload-section {
