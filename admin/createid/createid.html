@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="create.css">
     <link rel="icon" type="image/png" href="../../assets/images/safeidlogo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://pay.coinbase.com/pay-sdk.js"></script>
 </head>
 <body>
 
@@ -22,18 +21,18 @@
         <div class="form-container">
             <form id="create-id-form">
                 <h2>Enter Refugee's Details</h2>
-
+                <div class="wallet-info" id="wallet-info" style="display:none;">
+                    <strong>Connected Wallet:</strong> <span id="wallet-address"></span>
+                </div>
                 <div class="camera-section">
                     <video id="camera-stream" autoplay playsinline></video>
                     <canvas id="photo-canvas" style="display:none;"></canvas>
                     <img id="photo-preview" src="#" alt="Captured photo preview">
-                    
                     <div class="button-group">
-                        <button type="button" id="capture-btn"><i class="fas fa-camera"></i> Capture Photo</button>
+                        <button type="button" id="capture-btn"><i class="fas fa-camera"></i> Capture</button>
                         <button type="button" id="recapture-btn" style="display: none;"><i class="fas fa-redo"></i> Recapture</button>
                     </div>
                 </div>
-                
                 <div class="input-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" placeholder="Enter full name" required>
@@ -50,7 +49,6 @@
                     <label for="nationality">Nationality</label>
                     <input type="text" id="nationality" name="nationality" placeholder="Enter nationality" required>
                 </div>
-                
                 <button type="submit" id="submit-btn" disabled>Create & Store ID</button>
             </form>
         </div>
@@ -66,7 +64,6 @@
         </div>
     </div>
     
-    <!-- YOUR SCRIPT LAST -->
     <script type="module" src="create.js"></script>
 </body>
 </html>
