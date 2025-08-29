@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeID Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">SafeID</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="upload.html">Upload</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero / Welcome Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <img src="user-photo.png" alt="User Photo" class="user-photo" id="userPhoto">
+      <h1>Welcome, <span id="userName">User</span> 👋</h1>
+      <p>Your decentralized identity dashboard</p>
+    </div>
+  </header>
+
+  <!-- User Info -->
+  <section class="user-info">
+    <h2>Profile Information</h2>
+    <div class="info-card">
+      <p><strong>Name:</strong> <span id="profileName"></span></p>
+      <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+      <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+      <p><strong>Wallet ID:</strong> <span id="profileWallet"></span></p>
+    </div>
+  </section>
+
+  <!-- Documents Section -->
+  <section class="documents">
+    <h2>Uploaded Documents</h2>
+    <table id="docsTable">
+      <thead>
+        <tr>
+          <th>Document Type</th>
+          <th>File Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Uploaded docs will load here -->
+      </tbody>
+    </table>
+  </section>
+
+  <script src="coinbase.js"></script>
+</body>
+</html>
