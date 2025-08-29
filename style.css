@@ -13,11 +13,11 @@ body {
   font-size: 16px;
 }
 
-/* Navbar */
-.navbar {
+.navbar { 
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; 
   align-items: center;
+<<<<<<< HEAD
   background: #ffffff;
   padding: 1rem 2rem;
   position: sticky;
@@ -26,14 +26,24 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-bottom: 1px solid #e1e4e8;
 }
+=======
+  padding: 15px 50px;
+  background: #2e62b3;
+  color: #fff; }
+>>>>>>> 009baffa749ab400ad4a85293ef2c7571d4afd1a
 
 .logo {
   font-size: 1.8rem;
+<<<<<<< HEAD
   font-weight: 700;
   color: #0078d7; /* calm blue */
   letter-spacing: 1.5px;
   cursor: pointer;
   user-select: none;
+=======
+  font-weight: bold;
+  color:white;
+>>>>>>> 009baffa749ab400ad4a85293ef2c7571d4afd1a
 }
 
 .navbar ul {
@@ -57,6 +67,7 @@ body {
   color: #fff;
 }
 
+<<<<<<< HEAD
 .btn {
   background-color: #0078d7;
   color: #fff !important;
@@ -87,12 +98,24 @@ body {
   background-color: #0078d7;
   border-radius: 2px;
   transition: all 0.3s ease;
+=======
+.navbar .btn {
+  background:#4976d6 ;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.navbar .btn:hover {
+  background:#3679e0;
+>>>>>>> 009baffa749ab400ad4a85293ef2c7571d4afd1a
 }
 
 /* Hero Section */
 .hero {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   justify-content: space-between;
   padding: 4rem 3rem;
   background-color: #ffffff;
@@ -102,6 +125,11 @@ body {
   flex-wrap: wrap;
   margin: 2rem auto;
   max-width: 1200px;
+=======
+  padding: 60px 50px;
+  background: linear-gradient(135deg, #507dde, #bdddfc);
+  color: #fff;
+>>>>>>> 009baffa749ab400ad4a85293ef2c7571d4afd1a
 }
 
 .hero-text {
@@ -124,11 +152,18 @@ body {
 }
 
 .cta-btn {
+<<<<<<< HEAD
   background-color: #0078d7;
   color: #fff;
   padding: 0.75rem 2rem;
   border-radius: 6px;
   font-weight: 600;
+=======
+  background: #fff;
+  color:#507dde;
+  padding: 12px 20px;
+  border-radius: 5px;
+>>>>>>> 009baffa749ab400ad4a85293ef2c7571d4afd1a
   text-decoration: none;
   display: inline-block;
   transition: background-color 0.2s ease;
