@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Store your admin accounts here ---
     // In a real application, this data would come from a secure backend server.
     const adminAccounts = [
-        { username: 'admin', password: 'password123' },
+        { username: 'admin', password: '123' },
         { username: 'super_admin', password: 'super_secure_pass' },
         { username: 'tech_support', password: 'support@2025' }
     ];
