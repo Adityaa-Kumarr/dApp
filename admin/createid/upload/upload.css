@@ -6,12 +6,15 @@ body {
 }
 
 .navbar {
-  background: #1d2671;
+  background: rgb(2, 1, 52);
   color: white;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.navbar .logo-img{
+  height:40px;
 }
 
 .nav-links {
@@ -26,8 +29,13 @@ body {
   font-weight: 500;
 }
 
-.nav-links a.active {
-  border-bottom: 2px solid #ffcc00;
+.nav-links a:hover{
+  height:20px;
+  border:1px solid rgb(4, 26, 74);
+  
+  background: lightblue;
+  color: black;
+  
 }
 
 .upload-section {
@@ -71,7 +79,7 @@ button {
 }
 
 button {
-  background: #1d2671;
+  background: rgb(13, 2, 81);
   color: white;
   cursor: pointer;
   border: none;
@@ -79,7 +87,8 @@ button {
 }
 
 button:hover {
-  background: #c33764;
+  background: rgb(178, 229, 245);
+  color:black;
 }
 
 #uploadStatus {
