@@ -1,40 +1,52 @@
-// Wait for the HTML document to be fully loaded before running the script
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Store your admin accounts here ---
+    // In a real application, this data would come from a secure backend server.
+    const adminAccounts = [
+        { username: 'admin', password: 'password123' },
+        { username: 'super_admin', password: 'super_secure_pass' },
+        { username: 'tech_support', password: 'support@2025' }
+    ];
 
-  // Get references to the HTML elements we need to work with
-  const loginForm = document.getElementById('adminLoginForm');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const errorMessage = document.getElementById('errorMessage');
+    const form = document.getElementById('admin-login-form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
 
-  // Add an event listener to the form to handle the 'submit' event
-  loginForm.addEventListener('submit', (event) => {
-    // Prevent the default form submission, which would reload the page
-    event.preventDefault();
-
-    // Get the values entered by the user and trim any whitespace
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    // --- IMPORTANT ---
-    // This is a basic front-end check for demonstration purposes ONLY.
-    // In a real application, you would send this data to a secure server for validation.
-    // NEVER store actual passwords or handle logins like this in production code.
-    if (email === 'admin' && password === '123') {
-      // If credentials are correct, show a success message
-      errorMessage.textContent = 'Login successful! Redirecting...';
-      errorMessage.style.color = 'green';
-
-      // Simulate redirecting to an admin dashboard after 2 seconds
-      setTimeout(() => {
-        // In a real app, you would redirect to the admin dashboard page
-        window.location.href = './dashboard.html';
-      }, 2000);
-
-    } else {
-      // If credentials are incorrect, show an error message
-      errorMessage.textContent = 'Invalid username or password. Please try again.';
-      errorMessage.style.color = 'red';
+    // It's good practice to have an element for messages
+    // Add <p id="login-message"></p> inside your form in the HTML to use this
+    const messageElement = document.getElementById('login-message') || document.createElement('p');
+    if (!document.getElementById('login-message')) {
+        messageElement.id = 'login-message';
+        form.appendChild(messageElement);
     }
-  });
+    
+
+    form.addEventListener('submit', (event) => {
+        // Prevent the form from reloading the page
+        event.preventDefault();
+
+        const enteredUsername = usernameInput.value.trim();
+        const enteredPassword = passwordInput.value;
+
+        // Find a user in the array that matches the input credentials
+        const validUser = adminAccounts.find(
+            (account) => account.username === enteredUsername && account.password === enteredPassword
+        );
+
+        if (validUser) {
+            // If a match is found
+            messageElement.textContent = `Welcome, ${validUser.username}! Logging in...`;
+            messageElement.style.color = 'green';
+
+            // Redirect to a dashboard after a short delay
+            setTimeout(() => {
+                // Replace 'admin-dashboard.html' with your actual dashboard page
+                window.location.href = 'admin-dashboard.html';
+            }, 1500);
+
+        } else {
+            // If no match is found
+            messageElement.textContent = 'Invalid username or password. Please try again.';
+            messageElement.style.color = 'red';
+        }
+    });
 });

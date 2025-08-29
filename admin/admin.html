@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SafeID Admin Login</title>
     <link rel="stylesheet" href="admin.css">
+    <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -32,6 +33,8 @@
             </div>
             
             <button type="submit">Login</button>
+            
+            <p id="login-message"></p>
         </form>
     </div>
 
@@ -48,6 +51,8 @@
             this.classList.toggle('fa-eye-slash');
         });
     </script>
+
+    <script src="admin.js"></script>
 
 </body>
 </html>
