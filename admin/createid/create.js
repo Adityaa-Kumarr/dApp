@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show the fingerprint modal
             modal.style.display = 'flex';
 
-            // Set a timeout to redirect to the scan page after a few seconds
+            // Set a timeout to redirect to the upload page after a few seconds
             setTimeout(() => {
-                window.location.href = 'scan.html';
+                window.location.href = 'upload/upload.html';
             }, 3000); // Redirect after 3 seconds
         } else {
             // If form is invalid, trigger browser's validation messages
