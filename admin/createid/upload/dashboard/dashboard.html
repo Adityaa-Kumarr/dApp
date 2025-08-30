@@ -69,7 +69,7 @@
     <div class="hero-content">
       <!-- The src of this image will be set by the script -->
       <img src="https://via.placeholder.com/100" alt="User Photo" class="user-photo" id="userPhoto">
-      <h1>Welcome, <span id="userName">[Refugee Name]</span> 👋</h1>
+      <h1>Welcome, <span id="userName">[Refugee Name]</span> 🙏</h1>
       <p>Your decentralized identity dashboard</p>
     </div>
   </header>
@@ -115,16 +115,17 @@
       const urlParams = new URLSearchParams(window.location.search);
       const name = urlParams.get('name') || 'User';
       const email = urlParams.get('email') || 'N/A';
-      const phone = urlParams.get('phone') || 'N/A';
+      const phone = urlParams.get('phno') || 'N/A';
       const nationality = urlParams.get('nationality') || 'N/A';
       const wallet = urlParams.get('wallet') || '[Not Provided]';
       const initialCid = urlParams.get('cid'); // The CID of the main identity folder
       const newDocCid = urlParams.get('newDocCid'); // The CID of the newly uploaded document
       const newDocType = urlParams.get('docType');
+      const foldername = urlParams.get('foldername') ? `/${urlParams.get('foldername')}` : '';
 
       // --- Populate the Dashboard ---
       populateProfile(name, email, phone, nationality, wallet);
-      fetchAndDisplayPhoto(initialCid);
+      fetchAndDisplayPhoto(initialCid, foldername);
       populateDocumentsTable(initialCid, newDocCid, newDocType);
     });
 
@@ -143,12 +144,12 @@
     /**
      * Fetches the refugee's photo from the IPFS directory and displays it.
      */
-    async function fetchAndDisplayPhoto(cid) {
+    async function fetchAndDisplayPhoto(cid, foldername) {
       if (!cid) return; // Don't try to fetch if there's no main CID
 
       const userPhoto = document.getElementById('userPhoto');
       // Construct the full URL to the photo inside the IPFS directory
-      const photoUrl = `${IPFS_GATEWAY}${cid}/photo.jpeg`;
+      const photoUrl = `${IPFS_GATEWAY}${cid}${foldername}/photo.jpeg`;
       
       console.log(`Fetching photo from: ${photoUrl}`);
       userPhoto.src = photoUrl;

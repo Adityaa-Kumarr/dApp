@@ -420,12 +420,14 @@
         }
     }
 
+    let folderNm;
     async function storeOnPinata(identityData, imageBlob) {
         if (!imageBlob) throw new Error("No image captured to upload.");
 
         const data = new FormData();
         const timestamp = Date.now();
         const folderName = `SafeID-Refugee-${name.value}-${timestamp}`;
+        folderNm = folderName;
 
         data.append('file', imageBlob, `${folderName}/photo.jpeg`);
 
@@ -484,10 +486,14 @@
     }
 
     function resetForm() {
-    // Save values before reset clears them
+    // Save values BEFORE reset clears them
     const userName = form.querySelector('#name').value;
+    const userEmail = form.querySelector('#email').value;
+    const userPhone = form.querySelector('#phone').value;
+    const userNationality = form.querySelector('#nationality').value;
     const cid = ipfsCidSpan.textContent;
 
+    // Now reset form + UI
     form.reset();
     recapturePhoto();
     fingerprintScanner.classList.remove('scanned');
@@ -499,11 +505,12 @@
 
     // Redirect with saved values
     if (cid && userName) {
-        location.href = `upload/upload.html?name=${encodeURIComponent(userName)}&cid=${encodeURIComponent(cid)}&email=${encodeURIComponent(form.querySelector('#email').value)}&phone=${encodeURIComponent(form.querySelector('#phone').value)}&nationality=${encodeURIComponent(form.querySelector('#nationality').value)}`;
+        location.href = `upload/upload.html?name=${encodeURIComponent(userName)}&cid=${encodeURIComponent(cid)}&email=${encodeURIComponent(userEmail)}&phone=${encodeURIComponent(userPhone)}&nationality=${encodeURIComponent(userNationality)}&foldername=${encodeURIComponent(folderNm)}`;
     } else {
         alert("Identity data not ready yet.");
     }
 }
+
 
 
     // --- Camera Logic ---

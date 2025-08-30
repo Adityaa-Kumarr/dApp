@@ -175,18 +175,6 @@
 
     confirmBtn.textContent = 'Uploading to IPFS...';
     confirmBtn.disabled = true;
-
-    const walletAddress = walletAddressInput.value.trim();
-
-    async function handleConfirmAndUpload() {
-    if (!selectedFile || !docTypeSelect.value) {
-      alert("Please select a document type and choose a file.");
-      return;
-    }
-
-    confirmBtn.textContent = 'Uploading to IPFS...';
-    confirmBtn.disabled = true;
-
     const walletAddress = walletAddressInput.value.trim();
 
     try {
@@ -206,16 +194,17 @@
       params.set('newDocCid', newDocCid);
       params.set('docType', docTypeSelect.value);
       params.set('email', currentUrlParams.get('email'));
-      params.set('phno', currentUrlParams.get('phno'));
+      params.set('phno', currentUrlParams.get('phone'));
       params.set('nationality', currentUrlParams.get('nationality'));
       params.set('cid', currentUrlParams.get('cid'));
+      params.set('foldername', currentUrlParams.get('foldername'));
 
       if (walletAddress) {
         params.set('wallet', walletAddress);
       }
       
       // Redirect to the dashboard with the complete set of parameters
-      window.location.href = `./dashboard.html?${params.toString()}`;
+      window.location.href = `./dashboard/dashboard.html?${params.toString()}`;
 
     } catch (error) {
       alert(`Upload failed: ${error.message}`);
@@ -223,7 +212,7 @@
       confirmBtn.disabled = false;
     }
   }
-  }
+  
 
   /**
    * Uploads the selected file to IPFS via Pinata with structured naming.
