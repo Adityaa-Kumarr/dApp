@@ -2,182 +2,154 @@
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.js";
 import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
 
+// --- CONFIGURATION ---
+// 🚨 CRITICAL SECURITY WARNING: Your Pinata key is publicly exposed.
+// Please go to Pinata, revoke your old key, and create a new one.
 const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiYWQxNDljODBjYzNkYTFhOTQ2YWMiLCJzY29wZWRLZXlTZWNyZXQiOiJiYjUzNDE0MjZmZGU3OWM5MjM0ZDBhMWFhY2NjOTM3NWMwYTFiZjM1YjY3MmUxNWNkYzMxOGU2MzIwMDg4MDBiIiwiZXhwIjoxNzg4MDMzMDA4fQ.jKhwK7R6upvEUB2dLo8HzW-LZtIlOG801IZX87DKUJE';
 const CONTRACT_ADDRESS = '0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B';
 const CONTRACT_ABI = [
     { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getIdentity", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" },
     { "inputs": [{ "internalType": "string", "name": "_cid", "type": "string" }], "name": "setIdentity", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ];
+const COINBASE_APP_ID = '4cd77bf5-76b7-445e-bf24-74deea94b6d1';
 
-// --- STATE MANAGEMENT ---
-let capturedImageBlob = null;
-let walletAddress = null;
+// --- STATE ---
+let coinbasePay;
+let signer;
 
-// --- DOM ELEMENT REFERENCES ---
-const connectWalletBtn = document.getElementById('connect-wallet-btn');
-const form = document.getElementById('create-id-form');
-const submitBtn = document.getElementById('submit-btn');
-const video = document.getElementById('camera-stream');
-const canvas = document.getElementById('photo-canvas');
-const captureBtn = document.getElementById('capture-btn');
-const photoPreview = document.getElementById('photo-preview');
-const modal = document.getElementById('fingerprint-modal');
-const modalSpinner = document.getElementById('modal-spinner');
-const modalIcon = document.getElementById('modal-icon');
-const modalTitle = document.getElementById('modal-title');
-const modalText = document.getElementById('modal-text');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const recaptureBtn = document.getElementById('recapture-btn');
-const walletInfoDiv = document.getElementById('wallet-info');
-const walletAddressSpan = document.getElementById('wallet-address');
-
-// --- FUNCTIONS ---
+// --- DOM ELEMENTS ---
+const createWalletBtn = document.getElementById('create-wallet-btn');
+const skipBtn = document.getElementById('skip-btn');
+const initialOptions = document.getElementById('initial-options');
+const processingState = document.getElementById('processing-state');
+const processingText = document.getElementById('processing-text');
 
 /**
- * Redirects the user to the dedicated sign-in page.
- * It passes the current page's URL so the sign-in page knows where to return.
+ * Converts a Base64 string back into a Blob.
  */
-function redirectToSignIn() {
-    const returnUrl = encodeURIComponent(window.location.pathname);
-    window.location.href = `../../../cdp-app/index.html?returnUrl=${returnUrl}`;
+function base64ToBlob(base64, contentType = '', sliceSize = 512) {
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteArrays = [];
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+    return new Blob(byteArrays, { type: contentType });
 }
 
-/**
- * Checks the URL for a 'walletAddress' parameter upon page load.
- * If found, it updates the UI to show the connected state.
- */
-function checkForWalletAddress() {
-    const params = new URLSearchParams(window.location.search);
-    walletAddress = params.get('walletAddress');
+async function handleWalletCreation() {
+    initialOptions.style.display = 'none';
+    processingState.style.display = 'block';
 
-    if (walletAddress) {
-        console.log("Wallet address received:", walletAddress);
-        // Display the address and enable the form
-        walletAddressSpan.textContent = walletAddress;
-        walletInfoDiv.style.display = 'block';
-        connectWalletBtn.style.display = 'none'; // Hide the connect button
-        submitBtn.disabled = false;
-    } else {
-        // If no wallet address, ensure the connect button is visible
-        connectWalletBtn.style.display = 'block';
-        walletInfoDiv.style.display = 'none';
+    try {
+        // Initialize the SDK and open the wallet pop-up
+        initializeCoinbaseSDK();
+        coinbasePay.open({ experience: 'embedded' });
+
+    } catch (error) {
+        console.error("Wallet creation process failed:", error);
+        alert("Could not start the wallet creation process.");
+        // Reset UI
+        initialOptions.style.display = 'block';
+        processingState.style.display = 'none';
     }
 }
 
-/**
- * NOTE: This is a SIMULATED blockchain transaction.
- * Because we used a redirect flow, this page doesn't have the 'signer' object needed
- * to create a real transaction. For a hackathon, this simulation is a practical approach.
- */
-async function storeCidOnBlockchain(cid) {
-    if (!walletAddress) throw new Error("Wallet not connected.");
-    console.log(`SIMULATING: Storing CID ${cid} for address ${walletAddress} on the blockchain.`);
-    // We wait for 1.5 seconds to mimic the time a real transaction would take.
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log("Transaction simulation complete.");
+function initializeCoinbaseSDK() {
+    coinbasePay = new window.coinbasePay({
+        appId: COINBASE_APP_ID,
+        onSuccess: (response) => {
+            // This is the callback after a user connects a wallet
+            const { provider: coinbaseProvider } = response;
+            const ethersProvider = new ethers.providers.Web3Provider(coinbaseProvider);
+            signer = ethersProvider.getSigner();
+            
+            // Now that we have a signer, proceed to upload and store data
+            uploadAndStoreData();
+        },
+        onExit: () => {
+            // If user closes the pop-up, reset the UI
+            initialOptions.style.display = 'block';
+            processingState.style.display = 'none';
+        },
+        onError: (error) => {
+            console.error("Failed to connect wallet:", error);
+            alert("Failed to connect wallet.");
+            initialOptions.style.display = 'block';
+            processingState.style.display = 'none';
+        }
+    });
 }
 
-/**
- * Handles the main form submission process.
- */
-async function handleFormSubmit(event) {
-    event.preventDefault();
-    if (!capturedImageBlob) {
-        alert("Please capture a photo first.");
+async function uploadAndStoreData() {
+    processingText.textContent = 'Uploading data to IPFS...';
+
+    // Retrieve the data from localStorage
+    const storedData = localStorage.getItem('refugeeData');
+    if (!storedData) {
+        alert("Error: No refugee data found. Please go back.");
         return;
     }
-    showModal('processing', 'Processing...', 'Please wait while we create the ID and store it securely.');
+    
+    const refugeeData = JSON.parse(storedData);
+    const photoBlob = base64ToBlob(refugeeData.photo, 'image/jpeg');
+
     try {
-        const formData = new FormData(form);
-        const cid = await storeOnPinata(formData, capturedImageBlob);
+        const cid = await storeOnPinata(refugeeData, photoBlob);
+        
+        processingText.textContent = 'Storing data on the blockchain...';
         await storeCidOnBlockchain(cid);
-        
-        // On success, redirect to the dashboard and pass the CID
+
+        // Clear local storage and redirect to dashboard
+        localStorage.removeItem('refugeeData');
         window.location.href = `dashboard.html?cid=${cid}`;
-        
+
     } catch (error) {
-        console.error("ID creation failed:", error);
-        showModal('error', 'Creation Failed', error.message);
+        console.error("Upload/Storage failed:", error);
+        alert(`An error occurred: ${error.message}`);
+        initialOptions.style.display = 'block';
+        processingState.style.display = 'none';
     }
 }
 
-
-// --- Camera, Modal, and Pinata functions ---
-
-async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        video.srcObject = stream;
-    } catch (error) {
-        console.error("Error accessing camera:", error);
-        alert("Could not access camera. Please grant permission.");
-    }
-}
-
-function takePicture() {
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    photoPreview.src = canvas.toDataURL('image/jpeg');
-    photoPreview.style.display = 'block';
-    video.style.display = 'none';
-    captureBtn.style.display = 'none';
-    recaptureBtn.style.display = 'inline-block';
-    canvas.toBlob(blob => { capturedImageBlob = blob; }, 'image/jpeg');
-}
-
-function recapturePhoto() {
-    video.style.display = 'block';
-    photoPreview.style.display = 'none';
-    captureBtn.style.display = 'inline-block';
-    recaptureBtn.style.display = 'none';
-    capturedImageBlob = null;
-}
-
-async function storeOnPinata(formData, imageBlob) {
-    if (!imageBlob) throw new Error("No image captured to upload.");
-    const identityData = { name: formData.get('name'), phone: formData.get('phone'), email: formData.get('email'), nationality: formData.get('nationality'), createdAt: new Date().toISOString() };
+async function storeOnPinata(identityData, imageBlob) {
     const data = new FormData();
     data.append('file', imageBlob, 'photo.jpeg');
     data.append('file', new Blob([JSON.stringify(identityData)], { type: 'application/json' }), 'identity.json');
-    console.log("Uploading files to IPFS via Pinata...");
-    try {
-        const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", data, { headers: { 'Authorization': `Bearer ${PINATA_JWT}` } });
-        const cid = res.data.IpfsHash;
-        console.log("Successfully stored on Pinata. CID:", cid);
-        return cid;
-    } catch (error) {
-        console.error("Error uploading to Pinata:", error);
-        throw new Error("Failed to upload files to IPFS.");
-    }
+    const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", data, { headers: { 'Authorization': `Bearer ${PINATA_JWT}` } });
+    return res.data.IpfsHash;
 }
 
-function showModal(type, title, text) {
-    modal.style.display = 'flex';
-    modalTitle.textContent = title;
-    modalText.textContent = text;
-    modalSpinner.style.display = type === 'processing' ? 'block' : 'none';
-    modalIcon.style.display = type !== 'processing' ? 'block' : 'none';
-    closeModalBtn.style.display = type !== 'processing' ? 'block' : 'none';
-    modalIcon.className = 'fas';
-    if (type === 'success') modalIcon.classList.add('fa-check-circle');
-    else if (type === 'error') modalIcon.classList.add('fa-times-circle');
-    else modalIcon.classList.add('fa-fingerprint');
+async function storeCidOnBlockchain(cid) {
+    if (!signer) throw new Error("Wallet not connected.");
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    const tx = await contract.setIdentity(cid);
+    await tx.wait();
 }
 
+function handleSkip() {
+    // If skipping, redirect straight to the dashboard without a CID
+    window.location.href = 'dashboard.html';
+}
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    checkForWalletAddress();
-    startCamera();
-    
-    connectWalletBtn.addEventListener('click', redirectToSignIn);
-    captureBtn.addEventListener('click', takePicture);
-    recaptureBtn.addEventListener('click', recapturePhoto);
-    form.addEventListener('submit', handleFormSubmit);
-    closeModalBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
+    // Wait for the SDK to be ready
+    let attempts = 0;
+    const interval = setInterval(() => {
+        if (window.coinbasePay) {
+            clearInterval(interval);
+            // Attach event listeners ONLY after SDK is ready
+            createWalletBtn.addEventListener('click', handleWalletCreation);
+            skipBtn.addEventListener('click', handleSkip);
+        } else if (++attempts > 20) {
+            clearInterval(interval);
+            alert("Could not load wallet components. Please check your internet connection.");
+        }
+    }, 500);
 });
-
