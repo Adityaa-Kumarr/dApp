@@ -1,14 +1,14 @@
 /* General body styling */
 body {
     font-family: Arial, sans-serif;
-    background-color:#88BDF2;
+    background-color:white;
     margin: 0;
     color: #333;
 }
 
 /* --- Navigation Bar --- */
 nav {
-    background-color: rgb(2, 2, 64);
+    background-color:  #b7dbed;
     padding: 15px 30px;
     box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
     display: flex;

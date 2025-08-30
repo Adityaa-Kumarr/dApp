@@ -7,7 +7,7 @@
 }
 
 body {
-  background-color: #f9fbfd; /* very light gray-blue */
+  background-color: #e2eefa; /* very light gray-blue */
   color: #1a1a1a;
   line-height: 1.6;
   font-size: 16px;
@@ -18,7 +18,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
+  background: #a0ceee;
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
@@ -228,8 +228,12 @@ body {
   margin: 3rem auto;
   padding: 0 3rem 4rem;
   text-align: center;
+    
+  transform: scale(1.1);
 }
-
+.features .feature-grid{
+  flex: 1 1 450px;
+}
 .features h2 {
   font-size: 2.4rem;
   margin-bottom: 2.5rem;
@@ -270,6 +274,10 @@ body {
 .feature-card p {
   font-size: 1rem;
   color: #555;
+  
+}
+.feature-card:hover{
+  transform:scale(1.1);
 }
 
 /* How It Works Section */
@@ -402,4 +410,80 @@ footer {
   .hamburger {
     display: flex;
   }
+}
+/* ====== Animations Added (without breaking UI) ====== */
+
+/* Keyframes */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Page Load Animation */
+body {
+  animation: fadeIn 0.8s ease-in;
+}
+
+/* Hero Section */
+.hero-text h1 {
+  animation: fadeUp 0.9s ease-out;
+}
+.hero-text p {
+  animation: fadeUp 1s ease-out;
+}
+.cta-btn {
+  animation: fadeUp 1.2s ease-out;
+}
+
+/* Hero Image */
+.hero-img img {
+  animation: scaleIn 1s ease-out;
+}
+
+/* About Section */
+.about {
+  animation: fadeUp 1s ease-out;
+}
+
+/* Feature Cards */
+.feature-card {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: transform 0.4s ease, box-shadow 0.3s ease, opacity 0.4s ease;
+}
+.feature-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Steps */
+.step {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.step.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Impact Section */
+#impact {
+  animation: fadeUp 1s ease-out;
 }
