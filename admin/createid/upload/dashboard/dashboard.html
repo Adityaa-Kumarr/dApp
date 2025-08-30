@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SafeID Dashboard</title>
-  <!-- CORRECTED: Assumed a more standard relative path for the icon -->
-  <link rel="icon" type="image/png" href="../../assets/images/safeidlogo.png">
+  <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
   <style>
     /* --- Global Styles --- */
     :root {
@@ -68,8 +67,9 @@
   <!-- Hero / Welcome Section -->
   <header class="hero">
     <div class="hero-content">
+      <!-- The src of this image will be set by the script -->
       <img src="https://via.placeholder.com/100" alt="User Photo" class="user-photo" id="userPhoto">
-      <h1>Welcome, <span id="userName">[Loading...]</span> 👋</h1>
+      <h1>Welcome, <span id="userName">[Refugee Name]</span> 👋</h1>
       <p>Your decentralized identity dashboard</p>
     </div>
   </header>
@@ -78,11 +78,11 @@
   <section class="info-section">
     <h2>Profile Information</h2>
     <div class="info-card">
-      <p><strong>Name:</strong> <span id="profileName">[Loading...]</span></p>
-      <p><strong>Email:</strong> <span id="profileEmail">[Loading...]</span></p>
-      <p><strong>Phone:</strong> <span id="profilePhone">[Loading...]</span></p>
-      <p><strong>Wallet Address:</strong> <span id="profileWallet">[Not Provided]</span></p>
-      <p><strong>IPFS Record:</strong> <span id="profileCid">[Loading...]</span></p>
+      <p><strong>Name:</strong> <span id="profileName"></span></p>
+      <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+      <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+      <p><strong>Nationality:</strong> <span id="profileNationality"></span></p>
+      <p><strong>Wallet Address:</strong> <span id="profileWallet"></span></p>
     </div>
   </section>
 
@@ -93,119 +93,101 @@
       <table class="documents-table" id="docsTable">
         <thead>
           <tr>
-            <th>Document</th>
+            <th>Document Type</th>
             <th>File on IPFS</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <!-- Dynamic rows will be inserted here -->
-          <tr><td colspan="3" id="docs-loading">Loading documents...</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <script type="module">
-    // --- IMPORTS ---
-    import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
-
-    // --- DOM ELEMENT REFERENCES ---
-    const userNameSpan = document.getElementById('userName');
-    const userPhoto = document.getElementById('userPhoto');
-    const profileName = document.getElementById('profileName');
-    const profileEmail = document.getElementById('profileEmail');
-    const profilePhone = document.getElementById('profilePhone');
-    const profileWallet = document.getElementById('profileWallet');
-    const profileCid = document.getElementById('profileCid');
-    const docsTableBody = document.querySelector('#docsTable tbody');
-    const docsLoading = document.getElementById('docs-loading');
-
+  <script>
     // --- IPFS GATEWAY ---
     const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
 
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
+      // Get all the data passed from the previous pages via URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const name = urlParams.get('name');
-      const cid = urlParams.get('cid');
-      const wallet = urlParams.get('wallet');
+      const name = urlParams.get('name') || 'User';
+      const email = urlParams.get('email') || 'N/A';
+      const phone = urlParams.get('phone') || 'N/A';
+      const nationality = urlParams.get('nationality') || 'N/A';
+      const wallet = urlParams.get('wallet') || '[Not Provided]';
+      const initialCid = urlParams.get('cid'); // The CID of the main identity folder
+      const newDocCid = urlParams.get('newDocCid'); // The CID of the newly uploaded document
+      const newDocType = urlParams.get('docType');
 
-      if (cid) {
-        populateDashboard(name, cid, wallet);
-      } else {
-        displayError("No identity record found. Please create an ID first.");
-      }
+      // --- Populate the Dashboard ---
+      populateProfile(name, email, phone, nationality, wallet);
+      fetchAndDisplayPhoto(initialCid);
+      populateDocumentsTable(initialCid, newDocCid, newDocType);
     });
 
     /**
-     * UPDATED: Fetches data from IPFS with a fallback, and populates the dashboard UI.
+     * Populates the static profile information from the URL parameters.
      */
-    async function populateDashboard(name, cid, wallet) {
-      // Immediately update the known information
-      userNameSpan.textContent = name || 'User';
-      profileName.textContent = name || 'N/A';
-      profileCid.textContent = cid;
-      if (wallet) {
-        profileWallet.textContent = wallet;
-      }
-
-      try {
-        let identityData;
-        let photoUrl = 'https://via.placeholder.com/100'; // Default placeholder photo
-
-        // --- NEW: Robust fetching logic ---
-        try {
-          // Attempt 1: Assume the CID is a directory containing the files (the correct structure).
-          const directoryIdentityUrl = `${IPFS_GATEWAY}${cid}/identity.json`;
-          console.log(`Attempt 1: Fetching from directory: ${directoryIdentityUrl}`);
-          const identityResponse = await axios.get(directoryIdentityUrl);
-          identityData = identityResponse.data;
-          photoUrl = `${IPFS_GATEWAY}${cid}/photo.jpeg`; // Set the photo URL if directory is found
-          console.log("Success: Fetched from directory structure.");
-        } catch (dirError) {
-          // Attempt 2: If the first attempt fails, the CID might point directly to the JSON file.
-          console.warn("Attempt 1 failed. The CID might not be a directory.");
-          const singleFileUrl = `${IPFS_GATEWAY}${cid}`;
-          console.log(`Attempt 2: Fetching CID as a single file: ${singleFileUrl}`);
-          const identityResponse = await axios.get(singleFileUrl);
-          identityData = identityResponse.data;
-          console.log("Success: Fetched CID as a single JSON file. Photo cannot be automatically located.");
-        }
-
-        // --- Populate the profile card with the fetched data ---
-        profileEmail.textContent = identityData.email || 'N/A';
-        profilePhone.textContent = identityData.phone || 'N/A';
-        
-        // --- Update the user photo ---
-        userPhoto.src = photoUrl;
-
-        // --- Populate the documents table ---
-        docsLoading.style.display = 'none'; // Hide the loading message
-        const newRow = docsTableBody.insertRow();
-        newRow.innerHTML = `
-          <td>Identity Record (Photo & Details)</td>
-          <td><a href="${IPFS_GATEWAY}${cid}" target="_blank" class="document-link">View Files</a></td>
-          <td class="status-verified">Verified on IPFS</td>
-        `;
-
-      } catch (error) {
-        console.error("Failed to fetch data from IPFS:", error);
-        displayError("Could not retrieve identity data from the decentralized network. The CID may be invalid or the record is still propagating.");
-      }
+    function populateProfile(name, email, phone, nationality, wallet) {
+      document.getElementById('userName').textContent = name;
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileEmail').textContent = email;
+      document.getElementById('profilePhone').textContent = phone;
+      document.getElementById('profileNationality').textContent = nationality;
+      document.getElementById('profileWallet').textContent = wallet;
     }
 
     /**
-     * Displays an error state on the dashboard.
+     * Fetches the refugee's photo from the IPFS directory and displays it.
      */
-    function displayError(message) {
-        userNameSpan.textContent = "Error";
-        profileName.textContent = message;
-        profileEmail.textContent = "N/A";
-        profilePhone.textContent = "N/A";
-        profileWallet.textContent = "N/A";
-        profileCid.textContent = "N/A";
-        docsLoading.textContent = "Failed to load documents.";
+    async function fetchAndDisplayPhoto(cid) {
+      if (!cid) return; // Don't try to fetch if there's no main CID
+
+      const userPhoto = document.getElementById('userPhoto');
+      // Construct the full URL to the photo inside the IPFS directory
+      const photoUrl = `${IPFS_GATEWAY}${cid}/photo.jpeg`;
+      
+      console.log(`Fetching photo from: ${photoUrl}`);
+      userPhoto.src = photoUrl;
+    }
+    
+    /**
+     * Populates the documents table with the records.
+     */
+    function populateDocumentsTable(initialCid, newDocCid, newDocType) {
+        const tableBody = document.querySelector('#docsTable tbody');
+        tableBody.innerHTML = ''; // Clear any existing rows
+
+        // Row for the main identity record (photo + details)
+        if(initialCid) {
+            const mainRow = tableBody.insertRow();
+            mainRow.innerHTML = `
+                <td>Initial Identity Record</td>
+                <td><a href="${IPFS_GATEWAY}${initialCid}" target="_blank" class="document-link">View Files</a></td>
+                <td class="status-verified">Verified on IPFS</td>
+            `;
+        }
+        
+        // Row for the newly uploaded document (if it exists)
+        if (newDocCid) {
+            const newDocRow = tableBody.insertRow();
+            newDocRow.innerHTML = `
+                <td>${formatDocType(newDocType)}</td>
+                <td><a href="${IPFS_GATEWAY}${newDocCid}" target="_blank" class="document-link">View File</a></td>
+                <td class="status-verified">Verified on IPFS</td>
+            `;
+        }
+    }
+    
+    /**
+     * A helper function to make document types look nice.
+     */
+    function formatDocType(docType) {
+        if (!docType) return 'Document';
+        return docType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()); // Capitalizes words
     }
 
   </script>

@@ -178,23 +178,51 @@
 
     const walletAddress = walletAddressInput.value.trim();
 
+    async function handleConfirmAndUpload() {
+    if (!selectedFile || !docTypeSelect.value) {
+      alert("Please select a document type and choose a file.");
+      return;
+    }
+
+    confirmBtn.textContent = 'Uploading to IPFS...';
+    confirmBtn.disabled = true;
+
+    const walletAddress = walletAddressInput.value.trim();
+
     try {
-      const cid = await uploadToPinata(selectedFile, walletAddress, docTypeSelect.value);
+      // This is the new CID for the document just uploaded on this page.
+      const newDocCid = await uploadToPinata(selectedFile, walletAddress, docTypeSelect.value);
       
-      // On success, redirect to the dashboard with all necessary info
+      // --- UPDATED REDIRECT LOGIC ---
+
+      // Use URLSearchParams for a clean and safe way to build the URL
       const params = new URLSearchParams();
-      params.set('name', refugeeNameSpan.textContent);
-      params.set('cid', cid);
+      
+      // Get existing parameters from the current URL (like the name passed from the previous page)
+      const currentUrlParams = new URLSearchParams(window.location.search);
+      
+      // Add all the necessary data for the dashboard
+      params.set('name', currentUrlParams.get('name') || refugeeNameSpan.textContent);
+      params.set('newDocCid', newDocCid);
+      params.set('docType', docTypeSelect.value);
+      params.set('email', currentUrlParams.get('email'));
+      params.set('phno', currentUrlParams.get('phno'));
+      params.set('nationality', currentUrlParams.get('nationality'));
+      params.set('cid', currentUrlParams.get('cid'));
+
       if (walletAddress) {
         params.set('wallet', walletAddress);
       }
-      window.location.href = `./dashboard/dashboard.html?${params.toString()}`;
+      
+      // Redirect to the dashboard with the complete set of parameters
+      window.location.href = `./dashboard.html?${params.toString()}`;
 
     } catch (error) {
       alert(`Upload failed: ${error.message}`);
       confirmBtn.textContent = 'Upload to IPFS & Go to Dashboard';
       confirmBtn.disabled = false;
     }
+  }
   }
 
   /**
