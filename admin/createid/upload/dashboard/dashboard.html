@@ -245,129 +245,151 @@
 
 
   <script>
-    // --- IPFS GATEWAY ---
-    const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
+  // --- IPFS Gateway ---
+  const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/";
 
-    // --- INITIALIZATION ---
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const name = urlParams.get('name') || 'User';
-      const email = urlParams.get('email') || 'N/A';
-      const phone = urlParams.get('phno') || 'N/A';
-      const nationality = urlParams.get('nationality') || 'N/A';
-      const wallet = urlParams.get('wallet') || '[Not Provided]';
-      const initialCid = urlParams.get('cid');
-      const newDocCid = urlParams.get('newDocCid');
-      const newDocType = urlParams.get('docType');
-      const foldername = urlParams.get('foldername') ? `/${urlParams.get('foldername')}` : '';
+  document.addEventListener("DOMContentLoaded", () => {
+    // Extract query params
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get("name") || "User";
+    const email = urlParams.get("email") || "N/A";
+    const phone = urlParams.get("phno") || "N/A";
+    const nationality = urlParams.get("nationality") || "N/A";
+    const wallet = urlParams.get("wallet") || "[Not Provided]";
+    const initialCid = urlParams.get("cid");
+    const newDocCid = urlParams.get("newDocCid");
+    const newDocType = urlParams.get("docType");
+    const foldername = urlParams.get("foldername")
+      ? `/${urlParams.get("foldername")}`
+      : "";
 
-      const photoUrl = initialCid ? `${IPFS_GATEWAY}${initialCid}${foldername}/photo.jpeg` : 'https://via.placeholder.com/100';
+    // Photo from IPFS if available
+    const photoUrl = initialCid
+      ? `${IPFS_GATEWAY}${initialCid}${foldername}/photo.jpeg`
+      : "https://via.placeholder.com/100";
 
-      populateProfile(name, email, phone, nationality, wallet);
-      fetchAndDisplayPhoto(photoUrl);
-      populateDocumentsTable(initialCid, newDocCid, newDocType);
-      populateIdCard(name, email, nationality, wallet, photoUrl);
-      
-      const card = document.getElementById('flipCard');
-      card.addEventListener('click', () => {
-          card.classList.toggle('is-flipped');
-      });
+    // Populate UI
+    populateProfile(name, email, phone, nationality, wallet);
+    fetchAndDisplayPhoto(photoUrl);
+    populateDocumentsTable(initialCid, newDocCid, newDocType);
+    populateIdCard(name, email, nationality, wallet, photoUrl);
 
-      // --- MODIFIED PDF Download Functionality ---
-      const downloadBtn = document.getElementById("downloadPdfBtn");
-downloadBtn.addEventListener("click", () => {
-    const element = document.getElementById("flipCard");
-    const userNameForFile = document.getElementById("userName").textContent.trim().replace(/\s+/g, "_");
-
-    const options = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `${userNameForFile}_SafeID_Card.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
-    };
-
-    // Ensure images loaded before capture
-    const imgs = element.getElementsByTagName("img");
-    const promises = Array.from(imgs).map(img => new Promise((resolve, reject) => {
-        img.crossOrigin = "anonymous";
-        if (img.complete) resolve();
-        else {
-            img.onload = resolve;
-            img.onerror = reject;
-        }
-    }));
-
-    Promise.all(promises).then(() => {
-        // Capture visible card
-        return html2pdf().set(options).from(element).save();
-    }).catch(err => {
-        console.error("PDF generation failed:", err);
-        alert("Could not generate PDF. Try again.");
+    // Flip card event
+    const card = document.getElementById("flipCard");
+    card.addEventListener("click", () => {
+      card.classList.toggle("is-flipped");
     });
-});
-});
 
-    function populateProfile(name, email, phone, nationality, wallet) {
-      document.getElementById('userName').textContent = name;
-      document.getElementById('profileName').textContent = name;
-      document.getElementById('profileEmail').textContent = email;
-      document.getElementById('profilePhone').textContent = phone;
-      document.getElementById('profileNationality').textContent = nationality;
-      document.getElementById('profileWallet').textContent = wallet;
+    // PDF download
+    // PDF download
+    const downloadBtn = document.getElementById("downloadPdfBtn");
+    downloadBtn.addEventListener("click", () => {
+      // --- THIS IS THE FIX ---
+      // Target the static front of the card, not the animated container.
+      const element = document.querySelector(".flip-card-front"); 
+      
+      const userNameForFile = document
+        .getElementById("userName")
+        .textContent.trim()
+        .replace(/\s+/g, "_");
+
+      const options = {
+        margin: [0, 0, 0, 0], // Set margin to 0 for a tighter fit
+        filename: `${userNameForFile}_SafeID_Card.pdf`,
+        image: { type: "jpeg", quality: 1.0 }, // Use higher quality
+        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
+        jsPDF: { unit: "in", format: [5, 3], orientation: "landscape" }, // Custom format to match card aspect ratio
+      };
+
+      // Ensure all images are loaded before generating PDF
+      const imgs = element.getElementsByTagName("img");
+      const promises = Array.from(imgs).map(
+        (img) =>
+          new Promise((resolve, reject) => {
+            // This setup helps with images from other domains (like the QR code)
+            img.crossOrigin = "anonymous"; 
+            if (img.complete) {
+              resolve();
+            } else {
+              img.onload = resolve;
+              img.onerror = (err) => {
+                console.error("Image failed to load:", img.src, err);
+                // We resolve anyway so the PDF can still be created, 
+                // though the image might be missing.
+                resolve(); 
+              };
+            }
+          })
+      );
+
+      Promise.all(promises)
+        .then(() => {
+          html2pdf().set(options).from(element).save();
+        })
+        .catch((err) => {
+          console.error("PDF generation failed:", err);
+          alert("Could not generate the PDF. Please check the console for errors.");
+        });
+    });
+  });
+  // ---- Helpers ----
+  function populateProfile(name, email, phone, nationality, wallet) {
+    document.getElementById("userName").textContent = name;
+    document.getElementById("profileName").textContent = name;
+    document.getElementById("profileEmail").textContent = email;
+    document.getElementById("profilePhone").textContent = phone;
+    document.getElementById("profileNationality").textContent = nationality;
+    document.getElementById("profileWallet").textContent = wallet;
+  }
+
+  function fetchAndDisplayPhoto(photoUrl) {
+    const userPhoto = document.getElementById("userPhoto");
+    userPhoto.src = photoUrl;
+  }
+
+  function populateDocumentsTable(initialCid, newDocCid, newDocType) {
+    const tableBody = document.querySelector("#docsTable tbody");
+    tableBody.innerHTML = "";
+
+    if (initialCid) {
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td>Initial Identity Record</td>
+        <td><a href="${IPFS_GATEWAY}${initialCid}" target="_blank" class="document-link">View Files</a></td>
+        <td class="status-verified">Verified on IPFS</td>
+      `;
     }
 
-    function fetchAndDisplayPhoto(photoUrl) {
-      const userPhoto = document.getElementById('userPhoto');
-      console.log(`Fetching photo from: ${photoUrl}`);
-      userPhoto.src = photoUrl;
+    if (newDocCid) {
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td>${formatDocType(newDocType)}</td>
+        <td><a href="${IPFS_GATEWAY}${newDocCid}" target="_blank" class="document-link">View File</a></td>
+        <td class="status-verified">Verified on IPFS</td>
+      `;
     }
-    
-    function populateDocumentsTable(initialCid, newDocCid, newDocType) {
-        const tableBody = document.querySelector('#docsTable tbody');
-        tableBody.innerHTML = ''; 
+  }
 
-        if(initialCid) {
-            const mainRow = tableBody.insertRow();
-            mainRow.innerHTML = `
-                <td>Initial Identity Record</td>
-                <td><a href="${IPFS_GATEWAY}${initialCid}" target="_blank" class="document-link">View Files</a></td>
-                <td class="status-verified">Verified on IPFS</td>
-            `;
-        }
-        
-        if (newDocCid) {
-            const newDocRow = tableBody.insertRow();
-            newDocRow.innerHTML = `
-                <td>${formatDocType(newDocType)}</td>
-                <td><a href="${IPFS_GATEWAY}${newDocCid}" target="_blank" class="document-link">View File</a></td>
-                <td class="status-verified">Verified on IPFS</td>
-            `;
-        }
-    }
-    
-    function populateIdCard(name, email, nationality, wallet, photoUrl) {
-        document.getElementById('cardUserPhoto').src = photoUrl;
-        document.getElementById('cardUserName').textContent = name;
-        document.getElementById('cardWalletAddress').textContent = wallet.substring(0, 6) + '...';
-        document.getElementById('cardNationality').textContent = nationality;
-        document.getElementById('cardEmail').textContent = email;
+  function populateIdCard(name, email, nationality, wallet, photoUrl) {
+    document.getElementById("cardUserPhoto").src = photoUrl;
+    document.getElementById("cardUserName").textContent = name;
+    document.getElementById("cardWalletAddress").textContent =
+      wallet.length > 10 ? wallet.substring(0, 6) + "..." : wallet;
+    document.getElementById("cardNationality").textContent = nationality;
+    document.getElementById("cardEmail").textContent = email;
 
-        const allDetails = {
-            name: name,
-            email: email,
-            nationality: nationality,
-            walletAddress: wallet,
-        };
-        const qrData = encodeURIComponent(JSON.stringify(allDetails));
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`;
-        document.getElementById('cardQrCode').src = qrApiUrl;
-    }
+    // QR code
+    const details = { name, email, nationality, walletAddress: wallet };
+    const qrData = encodeURIComponent(JSON.stringify(details));
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`;
+    document.getElementById("cardQrCode").src = qrUrl;
+  }
 
-    function formatDocType(docType) {
-        if (!docType) return 'Document';
-        return docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-  </script>
+  function formatDocType(docType) {
+    if (!docType) return "Document";
+    return docType.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+</script>
+
 </body>
 </html>
