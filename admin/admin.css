@@ -1,114 +1,150 @@
-/* General body styling */
 body {
-    font-family: Arial, sans-serif;
-    background-color:white;
-    margin: 0;
-    color: #333;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  height: 100vh;
+  background: #f5f7fa;
 }
 
-/* --- Navigation Bar --- */
-nav {
-    background-color:  #b7dbed;
-    padding: 15px 30px;
-    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo-img {
-    height: 70px; /* Adjust height as needed */
-    margin-right: 15px;
-}
-
-nav h1 {
-    font-size: 1.5em;
-    color:#88BDF2 ; /* Dark blue color from logo */
-    margin: 0;
-}
-
-/* --- Login Form --- */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 80px; /* Space below the navbar */
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
-form {
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    box-sizing: border-box;
+/* Left Form */
+.login-form {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 5rem;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.8s ease-in-out;
 }
 
-form h2 {
-    text-align: center;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 30px;
+.login-form.active {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.input-group {
-    margin-bottom: 20px;
+.logo {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
+h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #222;
 }
 
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
+p {
+  margin: 0.5rem 0 1.5rem;
+  color: #555;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
-    outline: none;
-    border-color: #007bff;
+form label {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  display: block;
+  color: #444;
 }
 
-/* Wrapper to position the eye icon inside the password field */
-.password-wrapper {
-    position: relative;
+form input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  outline: none;
+  font-size: 0.95rem;
 }
 
-#togglePassword {
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #888;
+form input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
 }
 
-button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
 }
 
-button:hover {
-    background-color: #0056b3;
+.options a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #0056b3;
+}
+
+
+
+
+
+
+
+
+
+
+/* Right Illustration */
+.login-illustration {
+  flex: 1;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.login-illustration img {
+  width: 80%;
+  border-radius: 30%;
+  max-width: 420px;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Floating Animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+  }
+  .login-illustration {
+    display: none;
+  }
+  .login-form {
+    padding: 2rem;
+  }
 }
