@@ -2,8 +2,10 @@
 * {
   margin: 0;
   padding: 0;
+  transition: .5s linear;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  scroll-behavior:  smooth;
 }
 
 body {
@@ -40,6 +42,7 @@ body {
   list-style: none;
   display: flex;
   gap: 1.5rem;
+  
 }
 
 .navbar ul li a {
