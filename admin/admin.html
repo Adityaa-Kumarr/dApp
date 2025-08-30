@@ -3,50 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login</title>
+  <title>Admin Login - SafeID</title>
   <link rel="stylesheet" href="admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
   <div class="login-container">
     <!-- Left Side (Form) -->
-    <div class="login-form slide-in">
+    <div class="login-form">
       <div class="logo">
-        <i class="fas fa-shield-alt"></i> <span>Admin Panel</span>
+        <i class="fas fa-shield-alt"></i> <span>SafeID Admin Panel</span>
       </div>
 
       <h2>Welcome Back</h2>
-      <p>Please enter your login details</p>
+      <p>Please enter your login details to proceed.</p>
 
       <form id="loginForm">
         <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
-            </div>
-
-
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-
-        <div class="options">
-          <label><input type="checkbox" id="remember"> Remember me</label>
-         
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
         </div>
 
-        <button type="submit" class="btn"><link><a href="createid/createid.html">Sign in</a></link></button>
-
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
         
-
-       
-
-       
+        <!-- Error Message Placeholder -->
+        <p class="error-message" id="errorMessage"></p>
+        <button type="submit" class="btn">Sign In</button>
       </form>
     </div>
 
     <!-- Right Side (Illustration) -->
     <div class="login-illustration">
-      <img src="admin.jpg" alt="Login Illustration">
+      <img src="admin.jpg" alt="Secure Administration Illustration">
     </div>
   </div>
 
