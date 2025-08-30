@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registered Refugees - SafeID</title>
+  <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
+  <style>
+    /* --- Global Styles --- */
+    :root {
+      --primary-color: #1a73e8;
+      --secondary-color: #f4f7fb;
+      --text-dark: #333;
+      --text-light: #fff;
+      --card-bg: #fff;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: var(--secondary-color); color: var(--text-dark); line-height: 1.6; }
+
+    /* --- Header & Navbar --- */
+    header {
+      background: var(--primary-color);
+      color: var(--text-light);
+      padding: 20px 0;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 2rem; }
+
+    /* --- Main Content & Table --- */
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    #refugeeTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #refugeeTable thead {
+      background: #e9ecef;
+    }
+    #refugeeTable th, #refugeeTable td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #dee2e6;
+    }
+    #refugeeTable th { font-weight: 600; }
+    #refugeeTable tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    #refugeeTable td .wallet-address {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    .dashboard-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .dashboard-link:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SafeID - Registered Refugees</h1>
+  </header>
+
+  <main>
+    <table id="refugeeTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Wallet / Unique ID</th>
+          <th>IPFS Record</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="refugeeBody">
+        <!-- Dynamic rows will be added here -->
+        <tr>
+            <td colspan="5" style="text-align: center;">Loading registered refugees from IPFS...</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script type="module">
+    // --- IMPORTS ---
+    import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
+
+    // --- CONFIGURATION ---
+    // 🚨 CRITICAL: This JWT must have ADMIN permissions on Pinata to query files.
+    const PINATA_JWT = 'PASTE_YOUR_NEW_ADMIN_PINATA_JWT_HERE';
+    const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
+
+    // --- DOM REFERENCES ---
+    const tableBody = document.getElementById('refugeeBody');
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchAllRefugeeData();
+    });
+
+    /**
+     * UPDATED: Fetches the list of records from the Pinata API and populates the table
+     * using only the metadata, avoiding multiple gateway requests.
+     */
+    async function fetchAllRefugeeData() {
+        if (PINATA_JWT === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNDEyYjc4YTlmNDE0MjQ4OTM2ZDgiLCJzY29wZWRLZXlTZWNyZXQiOiI1NzYxZGRjNDg5MzNlNDIzNWUzMzVlNmM5ZWQ4ZGYxN2Y2NTQ5Y2JjNjJjN2IwZmY0NWFjNWU5MmVjYTRhYjIyIiwiZXhwIjoxNzg4MTA0NzEyfQ.KNnlV2eyRTb6y_fX6Q00_GCmuzss2ucv30uoHDux9sI') {
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error: Pinata JWT is not configured in the code.</td></tr>`;
+            return;
+        }
+
+        // This Pinata API endpoint queries for files that have our custom 'recordIdentifier' metadata.
+        const queryUrl = `https://api.pinata.cloud/data/pinList?metadata[keyvalues]={"recordIdentifier":{"value":".*","op":"regexp"}}&status=pinned`;
+
+        try {
+            // Make ONE single request to the Pinata API
+            const response = await axios.get(queryUrl, {
+                headers: { 'Authorization': `Bearer ${PINATA_JWT}` }
+            });
+
+            const pinnedItems = response.data.rows;
+
+            if (pinnedItems.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No refugee records found on IPFS.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = '';
+            let count = 1;
+
+            // Loop through the results (this is all local, no more network requests)
+            for (const item of pinnedItems) {
+                const cid = item.ipfs_pin_hash;
+                const metadata = item.metadata;
+
+                // Extract the name and unique ID directly from the metadata
+                const fileName = metadata.name || 'Unknown';
+                const uniqueIdentifier = metadata.keyvalues.recordIdentifier || '[Not Provided]';
+
+                // We can parse the refugee's name from the structured filename
+                // Example: "0x123...abc_passport.pdf" -> "passport"
+                // Example: "Aditya_12345_id_card.png" -> "Aditya"
+                const nameParts = fileName.split('_');
+                const refugeeName = (nameParts[0].startsWith('0x') && nameParts.length > 1) ? nameParts[1] : nameParts[0];
+
+                const newRow = tableBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${count++}</td>
+                    <td>${refugeeName}</td>
+                    <td><span class="wallet-address">${uniqueIdentifier}</span></td>
+                    <td><a href="${IPFS_GATEWAY}${cid}" target="_blank" class="dashboard-link">${cid.substring(0, 15)}...</a></td>
+                    <td><a href="./dashboard.html?name=${encodeURIComponent(refugeeName)}&cid=${cid}&wallet=${encodeURIComponent(uniqueIdentifier)}" class="dashboard-link">View Dashboard</a></td>
+                `;
+            }
+
+        } catch (error) {
+            console.error("Failed to query Pinata:", error.response ? error.response.data : error);
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error: Could not fetch data from Pinata. Check your JWT and permissions.</td></tr>`;
+        }
+    }
+  </script>
+</body>
+</html>
+
