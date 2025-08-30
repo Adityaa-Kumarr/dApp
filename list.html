@@ -99,8 +99,9 @@
     import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
 
     // --- CONFIGURATION ---
-    // 🚨 CRITICAL: This JWT must have ADMIN permissions on Pinata to query files.
-    const PINATA_JWT = 'PASTE_YOUR_NEW_ADMIN_PINATA_JWT_HERE';
+    // 🚨 CRITICAL: Paste your new, secret JWT from Pinata here.
+    // The key should be a very long string that starts with "eyJ...".
+    const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMGY3ZTBlYzE5NmY1ZjdiMTJmYWIiLCJzY29wZWRLZXlTZWNyZXQiOiJiNmE5ODZmNjI4YWI5ODJkMDMwN2Q1MTgyZWJiMjAwN2IyMmU1YzM2M2ViN2RhNjYwYTYyYzAxZWZkN2JiMzIzIiwiZXhwIjoxNzg4MTA1MDU2fQ.IhY0PkkYQGMsH_ewop5GGqs_g0RZZCaEq1rXwN1uT3I';
     const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
 
     // --- DOM REFERENCES ---
@@ -112,11 +113,11 @@
     });
 
     /**
-     * UPDATED: Fetches the list of records from the Pinata API and populates the table
+     * Fetches the list of records from the Pinata API and populates the table
      * using only the metadata, avoiding multiple gateway requests.
      */
     async function fetchAllRefugeeData() {
-        if (PINATA_JWT === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNDEyYjc4YTlmNDE0MjQ4OTM2ZDgiLCJzY29wZWRLZXlTZWNyZXQiOiI1NzYxZGRjNDg5MzNlNDIzNWUzMzVlNmM5ZWQ4ZGYxN2Y2NTQ5Y2JjNjJjN2IwZmY0NWFjNWU5MmVjYTRhYjIyIiwiZXhwIjoxNzg4MTA0NzEyfQ.KNnlV2eyRTb6y_fX6Q00_GCmuzss2ucv30uoHDux9sI') {
+        if (PINATA_JWT === 'PASTE_YOUR_NEW_ADMIN_PINATA_JWT_HERE' || !PINATA_JWT) {
             tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error: Pinata JWT is not configured in the code.</td></tr>`;
             return;
         }
@@ -161,7 +162,7 @@
                     <td>${refugeeName}</td>
                     <td><span class="wallet-address">${uniqueIdentifier}</span></td>
                     <td><a href="${IPFS_GATEWAY}${cid}" target="_blank" class="dashboard-link">${cid.substring(0, 15)}...</a></td>
-                    <td><a href="./dashboard.html?name=${encodeURIComponent(refugeeName)}&cid=${cid}&wallet=${encodeURIComponent(uniqueIdentifier)}" class="dashboard-link">View Dashboard</a></td>
+                    <td><a href=".admin/createdid/upload/dashboard/dashboard.html?name=${encodeURIComponent(refugeeName)}&cid=${cid}&wallet=${encodeURIComponent(uniqueIdentifier)}" class="dashboard-link">View Dashboard</a></td>
                 `;
             }
 
