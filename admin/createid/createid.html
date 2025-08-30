@@ -319,225 +319,221 @@
             </div>
             <button id="close-modal-btn">Create Another ID</button>
         </div>
+        
     </div>
     
     <script type="module">
-        // --- IMPORTS ---
-        import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
+    import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
 
-        // --- CONFIGURATION ---
-        // 🚨 CRITICAL SECURITY WARNING: Your Pinata key is publicly exposed.
-        // You MUST go to Pinata, revoke your old key, and create a new one.
-        // This key should ideally live on a secure server, not in the browser.
-        const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjAyYjhiOTM3ZGE3ODhhMmI2NDgiLCJzY29wZWRLZXlTZWNyZXQiOiI0YWM0NDhhYTU4YTQxOGFhYWNhZTI3ZjQzOTQzMjViYjI0NjM4OGQwMGM3NDQ4OWUzOTcxZTQxYzk2YTE5MDRhIiwiZXhwIjoxNzg4MDUyNzE3fQ.9cpY0sGSWIwnVmdnxF0uYNrCzHi_FSRGw7wn2jER9cw';
+    // --- CONFIGURATION ---
+    const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjAyYjhiOTM3ZGE3ODhhMmI2NDgiLCJzY29wZWRLZXlTZWNyZXQiOiI0YWM0NDhhYTU4YTQxOGFhYWNhZTI3ZjQzOTQzMjViYjI0NjM4OGQwMGM3NDQ4OWUzOTcxZTQxYzk2YTE5MDRhIiwiZXhwIjoxNzg4MDUyNzE3fQ.9cpY0sGSWIwnVmdnxF0uYNrCzHi_FSRGw7wn2jER9cw';
 
-        // --- STATE MANAGEMENT ---
-        let capturedImageBlob = null;
-        let fingerprintScanned = false;
+    // --- STATE MANAGEMENT ---
+    let capturedImageBlob = null;
+    let fingerprintScanned = false;
+    let fingerprintCredential = null;
 
-        // --- DOM ELEMENT REFERENCES ---
-        const form = document.getElementById('create-id-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const video = document.getElementById('camera-stream');
-        const canvas = document.getElementById('photo-canvas');
-        const captureBtn = document.getElementById('capture-btn');
-        const photoPreview = document.getElementById('photo-preview');
-        const recaptureBtn = document.getElementById('recapture-btn');
-        const fingerprintScanner = document.getElementById('fingerprint-scanner');
-        const fingerprintStatus = document.getElementById('fingerprint-status');
-        const successModal = document.getElementById('success-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const modalSpinner = document.getElementById('modal-spinner');
-        const modalIcon = document.getElementById('modal-icon');
-        const modalTitle = document.getElementById('modal-title');
-        const modalText = document.getElementById('modal-text');
-        const cidDisplay = document.getElementById('cid-display');
-        const ipfsCidSpan = document.getElementById('ipfs-cid');
-        
-        // --- FUNCTIONS ---
+    // --- DOM ELEMENT REFERENCES ---
+    const form = document.getElementById('create-id-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const video = document.getElementById('camera-stream');
+    const canvas = document.getElementById('photo-canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const photoPreview = document.getElementById('photo-preview');
+    const recaptureBtn = document.getElementById('recapture-btn');
+    const fingerprintScanner = document.getElementById('fingerprint-scanner');
+    const fingerprintStatus = document.getElementById('fingerprint-status');
+    const successModal = document.getElementById('success-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalSpinner = document.getElementById('modal-spinner');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalText = document.getElementById('modal-text');
+    const cidDisplay = document.getElementById('cid-display');
+    const ipfsCidSpan = document.getElementById('ipfs-cid');
 
-        /**
-         * Simulates a fingerprint scan animation and updates the state.
-         */
-        function simulateFingerprintScan() {
-            if (fingerprintScanned) return; 
+    // --- FUNCTIONS ---
 
-            fingerprintScanner.classList.add('scanning');
-            fingerprintStatus.textContent = 'Scanning...';
+    async function simulateFingerprintScan() {
+        try {
+            fingerprintStatus.textContent = "Waiting for fingerprint...";
 
-            setTimeout(() => {
-                fingerprintScanner.classList.remove('scanning');
-                fingerprintScanner.classList.add('scanned');
-                fingerprintStatus.textContent = 'Scan Complete!';
-                fingerprintScanned = true;
-                checkFormReadiness();
-            }, 2500);
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge: new Uint8Array(32),
+                    rp: { name: "SafeID Refugee System" },
+                    user: {
+                        id: new Uint8Array(16),
+                        name: "refugee@example.com",
+                        displayName: "Refugee User"
+                    },
+                    pubKeyCredParams: [
+                        { type: "public-key", alg: -7 },   // ES256
+                        { type: "public-key", alg: -257 }  // RS256
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required"
+                    },
+                    timeout: 60000,
+                    attestation: "none"
+                }
+            });
+
+            console.log("✅ Biometric credential created:", credential);
+
+            fingerprintScanner.classList.add('scanned');
+            fingerprintStatus.textContent = "Fingerprint verified!";
+            fingerprintScanned = true;
+            fingerprintCredential = {
+                id: credential.id,
+                type: credential.type,
+                rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))),
+                response: {
+                    clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))),
+                    attestationObject: credential.response.attestationObject
+                        ? btoa(String.fromCharCode(...new Uint8Array(credential.response.attestationObject)))
+                        : null
+                }
+            };
+
+            checkFormReadiness();
+        } catch (err) {
+            console.error("Fingerprint scan failed:", err);
+            fingerprintStatus.textContent = "Scan failed or cancelled.";
         }
+    }
 
-        /**
-         * Checks if all conditions are met to enable the submit button.
-         */
-        function checkFormReadiness() {
-            if (capturedImageBlob && fingerprintScanned && form.checkValidity()) {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
+    function checkFormReadiness() {
+        if (capturedImageBlob && fingerprintScanned && form.checkValidity()) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
         }
-            /**
- * Uploads the identity data and photo to IPFS via Pinata.
- * @param {Object} identityData - JSON object with refugee info.
- * @param {Blob} imageBlob - Captured photo blob.
- * @returns {Promise<string>} IPFS CID.
- */
-async function storeOnPinata(identityData, imageBlob) {
-    if (!imageBlob) throw new Error("No image captured to upload.");
+    }
 
-    const data = new FormData();
+    async function storeOnPinata(identityData, imageBlob) {
+        if (!imageBlob) throw new Error("No image captured to upload.");
 
-    // Simulate directory structure: "SafeID/"
-    const timestamp = Date.now();
-    const folderName = `SafeID-Refugee-${timestamp}`;
+        const data = new FormData();
+        const timestamp = Date.now();
+        const folderName = `SafeID-Refugee-${timestamp}`;
 
-    data.append('file', imageBlob, `${folderName}/photo.jpeg`);
+        data.append('file', imageBlob, `${folderName}/photo.jpeg`);
 
-    const jsonBlob = new Blob([JSON.stringify(identityData)], { type: 'application/json' });
-    data.append('file', jsonBlob, `${folderName}/identity.json`);
+        const jsonBlob = new Blob([JSON.stringify(identityData)], { type: 'application/json' });
+        data.append('file', jsonBlob, `${folderName}/identity.json`);
 
-    // Metadata (optional but useful)
-    data.append('pinataMetadata', JSON.stringify({
-        name: folderName
-    }));
+        data.append('pinataMetadata', JSON.stringify({ name: folderName }));
+        data.append('pinataOptions', JSON.stringify({ wrapWithDirectory: true }));
 
-    // Required to wrap files in a directory
-    data.append('pinataOptions', JSON.stringify({
-        wrapWithDirectory: true
-    }));
-
-    try {
         const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", data, {
-            headers: {
-                'Authorization': `Bearer ${PINATA_JWT}`
-                // Do NOT set Content-Type — axios will handle it
-            }
+            headers: { 'Authorization': `Bearer ${PINATA_JWT}` }
         });
 
-        const cid = res.data.IpfsHash;
-        console.log("✅ Successfully stored on Pinata. CID:", cid);
-        return cid;
-    } catch (error) {
-        console.error("❌ Error uploading to Pinata:", error?.response?.data || error.message);
-        throw new Error("Failed to upload files to IPFS. Check your Pinata JWT and request formatting.");
+        return res.data.IpfsHash;
     }
-}
 
-
-        /**
-         * Handles the main form submission process.
-         */
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            if (!form.checkValidity() || !capturedImageBlob || !fingerprintScanned) {
-                alert("Please fill all fields, capture a photo, and scan a fingerprint.");
-                return;
-            }
-            
-            modalIcon.style.display = 'none';
-            modalSpinner.style.display = 'block';
-            modalTitle.textContent = 'Processing...';
-            modalText.textContent = 'Uploading data securely to IPFS. Please wait.';
-            cidDisplay.style.display = 'none';
-            successModal.style.display = 'flex';
-
-            try {
-                const formData = new FormData(form);
-
-                const refugeeData = {
-                    name: formData.get('name'),
-                    phone: formData.get('phone'),
-                    email: formData.get('email'),
-                    nationality: formData.get('nationality'),
-                    fingerprint: 'simulated_fingerprint_data_placeholder'
-                };
-
-                const cid = await storeOnPinata(refugeeData, capturedImageBlob);
-
-                modalSpinner.style.display = 'none';
-                modalIcon.style.display = 'block';
-                modalTitle.textContent = 'Success!';
-                modalText.textContent = 'The refugee\'s identity has been securely saved to IPFS.';
-                ipfsCidSpan.textContent = cid;
-                cidDisplay.style.display = 'block';
-
-            } catch (error) {
-                console.error("Failed to process data:", error);
-                alert(`An error occurred: ${error.message}`);
-                successModal.style.display = 'none';
-            }
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        if (!form.checkValidity() || !capturedImageBlob || !fingerprintScanned) {
+            alert("Please fill all fields, capture a photo, and scan a fingerprint.");
+            return;
         }
 
-        /**
-         * Resets the entire form to its initial state for a new entry.
-         */
-        function resetForm() {
-            form.reset();
-            recapturePhoto();
-            fingerprintScanner.classList.remove('scanned');
-            fingerprintStatus.textContent = 'Pending...';
-            fingerprintScanned = false;
-            checkFormReadiness();
+        modalIcon.style.display = 'none';
+        modalSpinner.style.display = 'block';
+        modalTitle.textContent = 'Processing...';
+        modalText.textContent = 'Uploading data securely to IPFS. Please wait.';
+        cidDisplay.style.display = 'none';
+        successModal.style.display = 'flex';
+
+        try {
+            const formData = new FormData(form);
+
+            const refugeeData = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                nationality: formData.get('nationality'),
+                fingerprint: fingerprintCredential || "verification_failed"
+            };
+
+            const cid = await storeOnPinata(refugeeData, capturedImageBlob);
+
+            modalSpinner.style.display = 'none';
+            modalIcon.style.display = 'block';
+            modalTitle.textContent = 'Success!';
+            modalText.textContent = 'The refugee\'s identity has been securely saved to IPFS.';
+            ipfsCidSpan.textContent = cid;
+            cidDisplay.style.display = 'block';
+
+        } catch (error) {
+            console.error("Failed to process data:", error);
+            alert(`An error occurred: ${error.message}`);
             successModal.style.display = 'none';
         }
+    }
 
-        // --- Camera Logic ---
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                video.srcObject = stream;
-            } catch (error) {
-                console.error("Error accessing camera:", error);
-                alert("Could not access camera. Please grant permission.");
-            }
+    function resetForm() {
+        form.reset();
+        recapturePhoto();
+        fingerprintScanner.classList.remove('scanned');
+        fingerprintStatus.textContent = 'Pending...';
+        fingerprintScanned = false;
+        fingerprintCredential = null;
+        checkFormReadiness();
+        successModal.style.display = 'none';
+    }
+
+    // --- Camera Logic ---
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = stream;
+        } catch (error) {
+            console.error("Error accessing camera:", error);
+            alert("Could not access camera. Please grant permission.");
         }
+    }
 
-        function takePicture() {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            photoPreview.src = canvas.toDataURL('image/jpeg');
-            photoPreview.style.display = 'block';
-            video.style.display = 'none';
-            captureBtn.style.display = 'none';
-            recaptureBtn.style.display = 'inline-block';
-            canvas.toBlob(blob => {
-                capturedImageBlob = blob;
-                checkFormReadiness();
-            }, 'image/jpeg');
-        }
-
-        function recapturePhoto() {
-            video.style.display = 'block';
-            photoPreview.style.display = 'none';
-            captureBtn.style.display = 'inline-block';
-            recaptureBtn.style.display = 'none';
-            capturedImageBlob = null;
+    function takePicture() {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        photoPreview.src = canvas.toDataURL('image/jpeg');
+        photoPreview.style.display = 'block';
+        video.style.display = 'none';
+        captureBtn.style.display = 'none';
+        recaptureBtn.style.display = 'inline-block';
+        canvas.toBlob(blob => {
+            capturedImageBlob = blob;
             checkFormReadiness();
-        }
+        }, 'image/jpeg');
+    }
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            startCamera();
-            
-            captureBtn.addEventListener('click', takePicture);
-            recaptureBtn.addEventListener('click', recapturePhoto);
-            fingerprintScanner.addEventListener('click', simulateFingerprintScan);
-            form.addEventListener('submit', handleFormSubmit);
-            closeModalBtn.addEventListener('click', resetForm);
-            
-            form.addEventListener('input', checkFormReadiness);
-        });
-    </script>
+    function recapturePhoto() {
+        video.style.display = 'block';
+        photoPreview.style.display = 'none';
+        captureBtn.style.display = 'inline-block';
+        recaptureBtn.style.display = 'none';
+        capturedImageBlob = null;
+        checkFormReadiness();
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        startCamera();
+        captureBtn.addEventListener('click', takePicture);
+        recaptureBtn.addEventListener('click', recapturePhoto);
+        fingerprintScanner.addEventListener('click', simulateFingerprintScan);
+        form.addEventListener('submit', handleFormSubmit);
+        closeModalBtn.addEventListener('click', resetForm);
+        form.addEventListener('input', checkFormReadiness);
+    });
+</script>
+
 </body>
 </html>
 
