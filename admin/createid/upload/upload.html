@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Documents - SafeID</title>
 <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
-<!-- Coinbase Embedded Wallet SDK -->
-<script src="https://pay.coinbase.com/pay-sdk.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
   body { background: #f4f7fb; color: #333; line-height: 1.6; }
@@ -35,7 +33,7 @@
   .upload-form input[type="file"]:focus,
   .upload-form input[type="text"]:focus { border-color: #1a73e8; box-shadow: 0 0 4px rgba(26,115,232,0.5); }
 
-  .btn { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
+  .btn { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.3s; text-align: center; display: inline-block; text-decoration: none;}
   .btn:hover:not(:disabled) { background: #155ab6; }
   .btn:disabled { background: #999; cursor: not-allowed; }
 
@@ -45,9 +43,11 @@
   .preview-container img { max-width: 200px; border-radius: 6px; border: 1px solid #ddd; }
   .preview-container .file-name { font-size: 14px; color: #555; background: #f0f0f0; padding: 5px 10px; border-radius: 4px; }
 
-  .wallet-section { margin-top: 20px; text-align: left; }
-  .wallet-section button { width: 100%; margin-top: 10px; margin-bottom: 5px; }
-  .wallet-address { margin-top: 10px; font-size: 14px; word-break: break-all; color: #333; background: #f0f0f0; padding: 10px; border-radius: 6px;}
+  .wallet-section { margin-top: 20px; text-align: left; border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+  .wallet-section input { width: 100%; margin-bottom: 10px; }
+  .secondary-btn { background: #6c757d; width: 100%; }
+  .secondary-btn:hover { background: #5a6268; }
+
 </style>
 </head>
 <body>
@@ -68,7 +68,7 @@
 <section class="upload-section">
   <div class="upload-card">
     <h1 id="upload-title">📤 Upload Documents for <span id="refugee-name">[Refugee Name]</span></h1>
-    <p class="subtitle">Securely upload documents and link them to the refugee's wallet.</p>
+    <p class="subtitle">Securely upload documents and optionally link them to a wallet address.</p>
 
     <!-- Upload Form -->
     <form id="uploadForm" class="upload-form">
@@ -88,15 +88,17 @@
       <div class="preview-container" id="previewContainer"></div>
     </form>
 
-    <!-- Wallet Linking -->
+    <!-- Wallet Linking (Optional) -->
     <div class="wallet-section">
-      <label>Link Refugee's Coinbase Wallet:</label>
-      <button class="btn" id="connectWalletBtn">Connect Wallet</button>
-      <div class="wallet-address" id="walletAddress" style="display: none;"></div>
+      <label for="walletAddressInput">Refugee's Wallet Address (Optional):</label>
+      <input type="text" id="walletAddressInput" placeholder="Paste wallet address here (e.g., 0x123...)">
+      
+      <label>Need to create a new wallet?</label>
+      <a href="PATH_TO_YOUR_SIGNIN_PAGE.html" target="_blank" class="btn secondary-btn" id="createWalletBtn">Create Wallet in New Tab</a>
     </div>
 
     <!-- Confirm Button -->
-    <button class="btn" id="confirmBtn" disabled>Upload to IPFS & Go to Dashboard</button>
+    <button class="btn" id="confirmBtn" disabled style="margin-top: 20px;">Upload to IPFS & Go to Dashboard</button>
   </div>
 </section>
 
@@ -105,81 +107,47 @@
   import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
 
   // --- CONFIGURATION ---
-  const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjAyYjhiOTM3ZGE3ODhhMmI2NDgiLCJzY29wZWRLZXlTZWNyZXQiOiI0YWM0NDhhYTU4YTQxOGFhYWNhZTI3ZjQzOTQzMjViYjI0NjM4OGQwMGM3NDQ4OWUzOTcxZTQxYzk2YTE5MDRhIiwiZXhwIjoxNzg4MDUyNzE3fQ.9cpY0sGSWIwnVmdnxF0uYNrCzHi_FSRGw7wn2jER9cw';
-  // Replace with your App ID from the Coinbase Developer Platform
-  const COINBASE_APP_ID = 'd1a2b1fb-a597-4fd9-87db-0b4993b4bec3';
+  // 🚨 CRITICAL SECURITY WARNING: Your Pinata key is publicly exposed.
+  // You MUST go to Pinata, revoke your old key, and create a new one.
+  const PINATA_JWT = 'PASTE_YOUR_NEW_PINATA_JWT_HERE';
 
   // --- DOM ELEMENT REFERENCES ---
   const refugeeNameSpan = document.getElementById('refugee-name');
   const fileInput = document.getElementById('fileUpload');
   const docTypeSelect = document.getElementById('docType');
+  const walletAddressInput = document.getElementById('walletAddressInput');
   const uploadStatus = document.getElementById('uploadStatus');
   const previewContainer = document.getElementById('previewContainer');
-  const connectWalletBtn = document.getElementById('connectWalletBtn');
-  const walletAddressDiv = document.getElementById('walletAddress');
   const confirmBtn = document.getElementById('confirmBtn');
 
   // --- STATE MANAGEMENT ---
-  let walletAddress = '';
   let selectedFile = null;
-  let coinbasePay = null;
 
   // --- INITIALIZATION ---
   document.addEventListener('DOMContentLoaded', () => {
-    // Get refugee name from a previous page (e.g., the ID creation page)
+    // Get refugee name from a previous page
     const urlParams = new URLSearchParams(window.location.search);
     const refugeeName = urlParams.get('name') || 'Refugee';
     refugeeNameSpan.textContent = refugeeName;
     
-    initializeCoinbaseSDK();
-
     fileInput.addEventListener('change', handleFileSelect);
-    connectWalletBtn.addEventListener('click', connectWallet);
     confirmBtn.addEventListener('click', handleConfirmAndUpload);
   });
 
   // --- FUNCTIONS ---
-
-  /**
-   * Initializes the Coinbase Embedded Wallet SDK.
-   */
-  function initializeCoinbaseSDK() {
-    if (window.coinbasePay) {
-        coinbasePay = new window.coinbasePay({
-            appId: COINBASE_APP_ID,
-            onSuccess: (response) => {
-                walletAddress = response.address;
-                walletAddressDiv.textContent = `Connected Wallet: ${walletAddress}`;
-                walletAddressDiv.style.display = 'block';
-                connectWalletBtn.textContent = 'Wallet Connected';
-                connectWalletBtn.disabled = true;
-                checkReadyState();
-            },
-            onError: (error) => console.error("Wallet connection failed:", error),
-        });
-    } else {
-        console.error('Coinbase SDK not loaded.');
-    }
-  }
-
-  /**
-   * Opens the Coinbase wallet connection pop-up.
-   */
-  function connectWallet() {
-    if (!coinbasePay) {
-        alert('Coinbase SDK not initialized. Please refresh.');
-        return;
-    }
-    coinbasePay.open({ experience: 'embedded' });
-  }
   
   /**
-   * Handles file selection and displays a preview.
+   * Handles file selection, displays a preview, and enables the confirm button.
    */
   function handleFileSelect() {
     previewContainer.innerHTML = '';
     selectedFile = fileInput.files[0];
-    if (!selectedFile) return;
+    if (!selectedFile) {
+        confirmBtn.disabled = true;
+        return;
+    }
+    
+    confirmBtn.disabled = false; // Enable button as soon as file is selected
 
     // Display preview
     if (selectedFile.type.startsWith('image/')) {
@@ -194,29 +162,21 @@
       previewContainer.appendChild(fileNameDiv);
     }
     uploadStatus.textContent = `Selected: ${selectedFile.name}`;
-    checkReadyState();
-  }
-
-  /**
-   * Checks if both a file is selected and a wallet is connected to enable the confirm button.
-   */
-  function checkReadyState() {
-    if (selectedFile && walletAddress) {
-      confirmBtn.disabled = false;
-    }
   }
 
   /**
    * Handles the final confirmation, uploads to IPFS, and redirects to the dashboard.
    */
   async function handleConfirmAndUpload() {
-    if (!selectedFile || !walletAddress || !docTypeSelect.value) {
-      alert("Please select a document type, choose a file, and connect a wallet.");
+    if (!selectedFile || !docTypeSelect.value) {
+      alert("Please select a document type and choose a file.");
       return;
     }
 
     confirmBtn.textContent = 'Uploading to IPFS...';
     confirmBtn.disabled = true;
+
+    const walletAddress = walletAddressInput.value.trim();
 
     try {
       const cid = await uploadToPinata(selectedFile, walletAddress, docTypeSelect.value);
@@ -224,8 +184,10 @@
       // On success, redirect to the dashboard with all necessary info
       const params = new URLSearchParams();
       params.set('name', refugeeNameSpan.textContent);
-      params.set('wallet', walletAddress);
-      params.set('cid', cid); // Add the new IPFS CID
+      params.set('cid', cid);
+      if (walletAddress) {
+        params.set('wallet', walletAddress);
+      }
       window.location.href = `../../../dashboard.html?${params.toString()}`;
 
     } catch (error) {
@@ -239,8 +201,13 @@
    * Uploads the selected file to IPFS via Pinata with structured naming.
    */
   async function uploadToPinata(file, wallet, docType) {
+    // Use the wallet address for the filename, or a fallback if it's not provided
+    const refugeeName = refugeeNameSpan.textContent.replace(/\s+/g, '_');
+    const fallbackId = `${refugeeName}_${Date.now()}`;
+    const uniqueIdentifier = wallet || fallbackId;
+
     const fileExtension = file.name.split('.').pop();
-    const structuredFilename = `${wallet}_${docType}.${fileExtension}`;
+    const structuredFilename = `${uniqueIdentifier}_${docType}.${fileExtension}`;
 
     const data = new FormData();
     data.append('file', file);
@@ -248,7 +215,7 @@
     const metadata = JSON.stringify({
       name: structuredFilename,
       keyvalues: {
-        refugeeWallet: wallet // Custom metadata to easily find all files for this wallet later
+        recordIdentifier: uniqueIdentifier // Custom metadata for easy querying
       }
     });
     data.append('pinataMetadata', metadata);
@@ -271,3 +238,4 @@
 
 </body>
 </html>
+
