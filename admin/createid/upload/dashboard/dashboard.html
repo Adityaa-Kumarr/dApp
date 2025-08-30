@@ -4,56 +4,211 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SafeID Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <!-- CORRECTED: Assumed a more standard relative path for the icon -->
+  <link rel="icon" type="image/png" href="../../assets/images/safeidlogo.png">
+  <style>
+    /* --- Global Styles --- */
+    :root {
+      --primary-color: #1a73e8;
+      --secondary-color: #f4f7fb;
+      --text-dark: #333;
+      --text-light: #fff;
+      --card-bg: #fff;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: var(--secondary-color); color: var(--text-dark); line-height: 1.6; }
+
+    /* --- Navbar --- */
+    .navbar { background: var(--primary-color); padding: 15px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1100px; margin: auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { color: var(--text-light); font-weight: bold; font-size: 24px; }
+    .nav-links { list-style: none; display: flex; gap: 25px; }
+    .nav-links li a { text-decoration: none; color: var(--text-light); font-weight: 500; transition: 0.3s; }
+    .nav-links li a:hover, .nav-links li a.active { color: #ffdd57; }
+
+    /* --- Hero Section --- */
+    .hero { background: var(--primary-color); color: var(--text-light); text-align: center; padding: 40px 20px; }
+    .hero-content { max-width: 800px; margin: auto; }
+    .user-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--text-light); object-fit: cover; margin-bottom: 15px; background: #fff; }
+    .hero h1 { font-size: 2.5rem; }
+    .hero p { font-size: 1.1rem; opacity: 0.9; }
+
+    /* --- Sections & Cards --- */
+    .info-section { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+    .info-section h2 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    .info-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); }
+    .info-card p { font-size: 1rem; margin-bottom: 10px; }
+    .info-card p strong { color: #555; }
+    .info-card span { word-break: break-all; }
+
+    /* --- Documents Table --- */
+    .documents-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .documents-table thead { background: #e9ecef; }
+    .documents-table th, .documents-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+    .documents-table th { font-weight: 600; }
+    .status-verified { color: #28a745; font-weight: bold; }
+    .document-link { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+    .document-link:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">SafeID</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="upload.html">Upload</a></li>
-    </ul>
+    <div class="nav-container">
+      <div class="logo">SafeID</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="upload.html">Upload</a></li>
+      </ul>
+    </div>
   </nav>
 
   <!-- Hero / Welcome Section -->
   <header class="hero">
     <div class="hero-content">
-      <img src="user-photo.png" alt="User Photo" class="user-photo" id="userPhoto">
-      <h1>Welcome, <span id="userName">User</span> 👋</h1>
+      <img src="https://via.placeholder.com/100" alt="User Photo" class="user-photo" id="userPhoto">
+      <h1>Welcome, <span id="userName">[Loading...]</span> 👋</h1>
       <p>Your decentralized identity dashboard</p>
     </div>
   </header>
 
   <!-- User Info -->
-  <section class="user-info">
+  <section class="info-section">
     <h2>Profile Information</h2>
     <div class="info-card">
-      <p><strong>Name:</strong> <span id="profileName"></span></p>
-      <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-      <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
-      <p><strong>Wallet ID:</strong> <span id="profileWallet"></span></p>
+      <p><strong>Name:</strong> <span id="profileName">[Loading...]</span></p>
+      <p><strong>Email:</strong> <span id="profileEmail">[Loading...]</span></p>
+      <p><strong>Phone:</strong> <span id="profilePhone">[Loading...]</span></p>
+      <p><strong>Wallet Address:</strong> <span id="profileWallet">[Not Provided]</span></p>
+      <p><strong>IPFS Record:</strong> <span id="profileCid">[Loading...]</span></p>
     </div>
   </section>
 
   <!-- Documents Section -->
-  <section class="documents">
+  <section class="info-section">
     <h2>Uploaded Documents</h2>
-    <table id="docsTable">
-      <thead>
-        <tr>
-          <th>Document Type</th>
-          <th>File Name</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Uploaded docs will load here -->
-      </tbody>
-    </table>
+    <div class="info-card">
+      <table class="documents-table" id="docsTable">
+        <thead>
+          <tr>
+            <th>Document</th>
+            <th>File on IPFS</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic rows will be inserted here -->
+          <tr><td colspan="3" id="docs-loading">Loading documents...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
-  <script src="coinbase.js"></script>
+  <script type="module">
+    // --- IMPORTS ---
+    import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
+
+    // --- DOM ELEMENT REFERENCES ---
+    const userNameSpan = document.getElementById('userName');
+    const userPhoto = document.getElementById('userPhoto');
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profilePhone = document.getElementById('profilePhone');
+    const profileWallet = document.getElementById('profileWallet');
+    const profileCid = document.getElementById('profileCid');
+    const docsTableBody = document.querySelector('#docsTable tbody');
+    const docsLoading = document.getElementById('docs-loading');
+
+    // --- IPFS GATEWAY ---
+    const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const name = urlParams.get('name');
+      const cid = urlParams.get('cid');
+      const wallet = urlParams.get('wallet');
+
+      if (cid) {
+        populateDashboard(name, cid, wallet);
+      } else {
+        displayError("No identity record found. Please create an ID first.");
+      }
+    });
+
+    /**
+     * UPDATED: Fetches data from IPFS with a fallback, and populates the dashboard UI.
+     */
+    async function populateDashboard(name, cid, wallet) {
+      // Immediately update the known information
+      userNameSpan.textContent = name || 'User';
+      profileName.textContent = name || 'N/A';
+      profileCid.textContent = cid;
+      if (wallet) {
+        profileWallet.textContent = wallet;
+      }
+
+      try {
+        let identityData;
+        let photoUrl = 'https://via.placeholder.com/100'; // Default placeholder photo
+
+        // --- NEW: Robust fetching logic ---
+        try {
+          // Attempt 1: Assume the CID is a directory containing the files (the correct structure).
+          const directoryIdentityUrl = `${IPFS_GATEWAY}${cid}/identity.json`;
+          console.log(`Attempt 1: Fetching from directory: ${directoryIdentityUrl}`);
+          const identityResponse = await axios.get(directoryIdentityUrl);
+          identityData = identityResponse.data;
+          photoUrl = `${IPFS_GATEWAY}${cid}/photo.jpeg`; // Set the photo URL if directory is found
+          console.log("Success: Fetched from directory structure.");
+        } catch (dirError) {
+          // Attempt 2: If the first attempt fails, the CID might point directly to the JSON file.
+          console.warn("Attempt 1 failed. The CID might not be a directory.");
+          const singleFileUrl = `${IPFS_GATEWAY}${cid}`;
+          console.log(`Attempt 2: Fetching CID as a single file: ${singleFileUrl}`);
+          const identityResponse = await axios.get(singleFileUrl);
+          identityData = identityResponse.data;
+          console.log("Success: Fetched CID as a single JSON file. Photo cannot be automatically located.");
+        }
+
+        // --- Populate the profile card with the fetched data ---
+        profileEmail.textContent = identityData.email || 'N/A';
+        profilePhone.textContent = identityData.phone || 'N/A';
+        
+        // --- Update the user photo ---
+        userPhoto.src = photoUrl;
+
+        // --- Populate the documents table ---
+        docsLoading.style.display = 'none'; // Hide the loading message
+        const newRow = docsTableBody.insertRow();
+        newRow.innerHTML = `
+          <td>Identity Record (Photo & Details)</td>
+          <td><a href="${IPFS_GATEWAY}${cid}" target="_blank" class="document-link">View Files</a></td>
+          <td class="status-verified">Verified on IPFS</td>
+        `;
+
+      } catch (error) {
+        console.error("Failed to fetch data from IPFS:", error);
+        displayError("Could not retrieve identity data from the decentralized network. The CID may be invalid or the record is still propagating.");
+      }
+    }
+
+    /**
+     * Displays an error state on the dashboard.
+     */
+    function displayError(message) {
+        userNameSpan.textContent = "Error";
+        profileName.textContent = message;
+        profileEmail.textContent = "N/A";
+        profilePhone.textContent = "N/A";
+        profileWallet.textContent = "N/A";
+        profileCid.textContent = "N/A";
+        docsLoading.textContent = "Failed to load documents.";
+    }
+
+  </script>
 </body>
 </html>
+
