@@ -326,7 +326,7 @@
     import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
 
     // --- CONFIGURATION ---
-    const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjAyYjhiOTM3ZGE3ODhhMmI2NDgiLCJzY29wZWRLZXlTZWNyZXQiOiI0YWM0NDhhYTU4YTQxOGFhYWNhZTI3ZjQzOTQzMjViYjI0NjM4OGQwMGM3NDQ4OWUzOTcxZTQxYzk2YTE5MDRhIiwiZXhwIjoxNzg4MDUyNzE3fQ.9cpY0sGSWIwnVmdnxF0uYNrCzHi_FSRGw7wn2jER9cw';
+    const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZjM4OTc3OS0yMWIzLTRkYWItYWNhZC0yOTRhMGY0Zjc0YzAiLCJlbWFpbCI6ImhhY2toYWNrYXRob242N0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiODIzODI4YmRhNDU3MDJmN2JkMjkiLCJzY29wZWRLZXlTZWNyZXQiOiJkMDA4ZjBjOTU2MDg5NGQwZDk1YzQ5NTlhMjQ1NTU2MjZmZjMwNTFmNjRkNjlkMTY5ZjFiYjc2ZDdmNGNhYWQ1IiwiZXhwIjoxNzg4MDkwNzAwfQ.2YWP1rBgKeqWbYuJroeGxaAzNZ98kJRuSvpyZm9F5no';
 
     // --- STATE MANAGEMENT ---
     let capturedImageBlob = null;
@@ -484,25 +484,27 @@
     }
 
     function resetForm() {
-        form.reset();
-        recapturePhoto();
-        fingerprintScanner.classList.remove('scanned');
-        fingerprintStatus.textContent = 'Pending...';
-        fingerprintScanned = false;
-        fingerprintCredential = null;
-        checkFormReadiness();
-        successModal.style.display = 'none';
-        // Redirect to upload page with CID & name
-        const userName = form.querySelector('#name').value;
-        const cid = ipfsCidSpan.textContent;
+    // Save values before reset clears them
+    const userName = form.querySelector('#name').value;
+    const cid = ipfsCidSpan.textContent;
 
-        if (cid && userName) {
-            location.href = `upload/upload.html?name=${encodeURIComponent(userName)}&cid=${encodeURIComponent(cid)}`;
-        } else {
-            alert("Identity data not ready yet.");
-        }
+    form.reset();
+    recapturePhoto();
+    fingerprintScanner.classList.remove('scanned');
+    fingerprintStatus.textContent = 'Pending...';
+    fingerprintScanned = false;
+    fingerprintCredential = null;
+    checkFormReadiness();
+    successModal.style.display = 'none';
 
+    // Redirect with saved values
+    if (cid && userName) {
+        location.href = `upload/upload.html?name=${encodeURIComponent(userName)}&cid=${encodeURIComponent(cid)}&email=${encodeURIComponent(form.querySelector('#email').value)}&phone=${encodeURIComponent(form.querySelector('#phone').value)}&nationality=${encodeURIComponent(form.querySelector('#nationality').value)}`;
+    } else {
+        alert("Identity data not ready yet.");
     }
+}
+
 
     // --- Camera Logic ---
     async function startCamera() {
@@ -554,4 +556,3 @@
 
 </body>
 </html>
-
