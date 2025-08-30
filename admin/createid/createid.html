@@ -351,6 +351,7 @@
     const modalText = document.getElementById('modal-text');
     const cidDisplay = document.getElementById('cid-display');
     const ipfsCidSpan = document.getElementById('ipfs-cid');
+    const name = document.getElementById('name');
 
     // --- FUNCTIONS ---
 
@@ -358,18 +359,24 @@
         try {
             fingerprintStatus.textContent = "Waiting for fingerprint...";
 
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const userId = new Uint8Array(16);
+            window.crypto.getRandomValues(userId);
+
             const credential = await navigator.credentials.create({
                 publicKey: {
-                    challenge: new Uint8Array(32),
+                    challenge,
                     rp: { name: "SafeID Refugee System" },
                     user: {
-                        id: new Uint8Array(16),
-                        name: "refugee@example.com",
-                        displayName: "Refugee User"
+                        id: userId,
+                        name: `${name.value}@safeid`,
+                        displayName: `${name.value}`
                     },
                     pubKeyCredParams: [
-                        { type: "public-key", alg: -7 },   // ES256
-                        { type: "public-key", alg: -257 }  // RS256
+                        { type: "public-key", alg: -7 },
+                        { type: "public-key", alg: -257 }
                     ],
                     authenticatorSelection: {
                         authenticatorAttachment: "platform",
@@ -379,6 +386,7 @@
                     attestation: "none"
                 }
             });
+
 
             console.log("✅ Biometric credential created:", credential);
 
@@ -417,7 +425,7 @@
 
         const data = new FormData();
         const timestamp = Date.now();
-        const folderName = `SafeID-Refugee-${timestamp}`;
+        const folderName = `SafeID-Refugee-${name.value}-${timestamp}`;
 
         data.append('file', imageBlob, `${folderName}/photo.jpeg`);
 
@@ -485,11 +493,15 @@
         checkFormReadiness();
         successModal.style.display = 'none';
         // Redirect to upload page with CID & name
-        const name = form.querySelector('#name').value;
+        const userName = form.querySelector('#name').value;
         const cid = ipfsCidSpan.textContent;
 
-        // Pass data via query params
-        location.href = `upload/upload.html?name=${encodeURIComponent(name)}&cid=${encodeURIComponent(cid)}`;
+        if (cid && userName) {
+            location.href = `upload/upload.html?name=${encodeURIComponent(userName)}&cid=${encodeURIComponent(cid)}`;
+        } else {
+            alert("Identity data not ready yet.");
+        }
+
     }
 
     // --- Camera Logic ---
