@@ -5,6 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Documents - SafeID</title>
 <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
+<script>
+        (function(){
+            if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+                window.chatbase = function() {
+                    if (!window.chatbase.q) { window.chatbase.q = []; }
+                    window.chatbase.q.push(arguments);
+                };
+                window.chatbase = new Proxy(window.chatbase, {
+                    get(target, prop) {
+                        if (prop === "q") { return target.q; }
+                        return function(...args) { return target(prop, ...args); };
+                    }
+                });
+            }
+            const onLoad = function() {
+                const script = document.createElement("script");
+                script.src = "https://www.chatbase.co/embed.min.js";
+                script.id = "K2IlH8AAd49HhuSnB4we1";
+                script.domain = "www.chatbase.co";
+                document.body.appendChild(script);
+            };
+            if (document.readyState === "complete") {
+                onLoad();
+            } else {
+                window.addEventListener("load", onLoad);
+            }
+        })();
+    </script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
   body { background: #f4f7fb; color: #333; line-height: 1.6; }
