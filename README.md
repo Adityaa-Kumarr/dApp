@@ -42,3 +42,7 @@ This ensures **security**, **transparency**, and **trustlessness** in every acti
 ```bash
 git clone https://github.com/Adityaa-Kumarr/dApp.git
 cd dApp
+
+
+##  Screenshot
+<img width="1434" height="725" alt="image" src="https://github.com/user-attachments/assets/b0b44b3b-5407-456a-8f02-081cedb0b4a5" />
