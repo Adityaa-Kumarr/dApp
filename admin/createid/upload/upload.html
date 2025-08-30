@@ -1,45 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Documents - SafeID</title>
-  <link rel="stylesheet" href="upload.css">
-  <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Documents - SafeID</title>
+<link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: #f4f7fb; color: #333; line-height: 1.6; }
+
+  /* --- NAVBAR --- */
+  .navbar { background: #1a73e8; padding: 15px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .nav-container { max-width: 1100px; margin: auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+  .logo-img { width: 120px; border-radius: 8px; }
+  .nav-links { list-style: none; display: flex; gap: 25px; }
+  .nav-links li a { text-decoration: none; color: #fff; font-weight: 500; transition: 0.3s; }
+  .nav-links li a:hover, .nav-links li a.active { color: #ffdd57; }
+
+  /* --- UPLOAD SECTION --- */
+  .upload-section { display: flex; justify-content: center; align-items: center; padding: 60px 20px; }
+  .upload-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 550px; width: 100%; text-align: center; }
+  .upload-card h1 { font-size: 26px; color: #1a73e8; margin-bottom: 10px; }
+  .subtitle { font-size: 14px; color: #555; margin-bottom: 25px; }
+
+  /* --- FORM --- */
+  .upload-form { display: flex; flex-direction: column; gap: 20px; text-align: left; }
+  .upload-form label { font-weight: 600; color: #333; }
+  .upload-form select,
+  .upload-form input[type="file"],
+  .upload-form input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; font-size: 14px; transition: 0.2s; width: 100%; }
+  .upload-form select:focus,
+  .upload-form input[type="file"]:focus,
+  .upload-form input[type="text"]:focus { border-color: #1a73e8; box-shadow: 0 0 4px rgba(26,115,232,0.5); }
+
+  .btn { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.3s; text-align: center; display: inline-block; text-decoration: none;}
+  .btn:hover:not(:disabled) { background: #155ab6; }
+  .btn:disabled { background: #999; cursor: not-allowed; }
+
+  /* --- UPLOAD STATUS --- */
+  .status { margin-top: 20px; font-size: 14px; color: #444; }
+  .preview-container { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .preview-container img { max-width: 200px; border-radius: 6px; border: 1px solid #ddd; }
+  .preview-container .file-name { font-size: 14px; color: #555; background: #f0f0f0; padding: 5px 10px; border-radius: 4px; }
+
+  .wallet-section { margin-top: 20px; text-align: left; border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+  .wallet-section input { width: 100%; margin-bottom: 10px; }
+  .secondary-btn { background: #6c757d; width: 100%; }
+  .secondary-btn:hover { background: #5a6268; }
+
+</style>
 </head>
 <body>
-  <nav class="navbar">
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-container">
     <img src="./safeidlogo.jpg" alt="SafeID Logo" class="logo-img">
     <ul class="nav-links">
       <li><a href="../../../index.html">Home</a></li>
       <li><a href="../../../dashboard.html">Dashboard</a></li>
       <li><a href="../../../upload.html" class="active">Upload</a></li>
     </ul>
-  </nav>
+  </div>
+</nav>
 
-  <section class="upload-section">
-    <h1>Upload Your Documents</h1>
-    <p>Securely upload your important documents. They will be linked to your decentralized identity and safely encrypted.</p>
+<!-- Upload Section -->
+<section class="upload-section">
+  <div class="upload-card">
+    <h1 id="upload-title">📤 Upload Documents for <span id="refugee-name">[Refugee Name]</span></h1>
+    <p class="subtitle">Securely upload documents and optionally link them to a wallet address.</p>
 
-    <form id="uploadForm">
-      <label for="docType">Document Type:</label>
+    <!-- Upload Form -->
+    <form id="uploadForm" class="upload-form">
+      <label for="docType">Select Document Type:</label>
       <select id="docType" name="docType" required>
         <option value="">--Select Document--</option>
-        <option value="id">Identity Card</option>
+        <option value="id_card">Identity Card</option>
         <option value="passport">Passport</option>
         <option value="certificate">Certificate</option>
-        <option value="others">Others</option>
+        <option value="other">Other</option>
       </select>
 
       <label for="fileUpload">Choose File:</label>
       <input type="file" id="fileUpload" name="fileUpload" accept=".pdf,.jpg,.jpeg,.png" required>
 
-      <button type="submit">Upload</button>
+      <div id="uploadStatus" class="status"></div>
+      <div class="preview-container" id="previewContainer"></div>
     </form>
 
-    <div id="uploadStatus"></div>
-  </section>
+    <!-- Wallet Linking (Optional) -->
+    <div class="wallet-section">
+      <label for="walletAddressInput">Refugee's Wallet Address (Optional):</label>
+      <input type="text" id="walletAddressInput" placeholder="Paste wallet address here (e.g., 0x123...)">
+      
+      <label>Need to create a new wallet?</label>
+      <a href="PATH_TO_YOUR_SIGNIN_PAGE.html" target="_blank" class="btn secondary-btn" id="createWalletBtn">Create Wallet in New Tab</a>
+    </div>
 
-  <script src="upload.js"></script>
+    <!-- Confirm Button -->
+    <button class="btn" id="confirmBtn" disabled style="margin-top: 20px;">Upload to IPFS & Go to Dashboard</button>
+  </div>
+</section>
+
+<script type="module">
+  // --- IMPORTS ---
+  import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm";
+
+  // --- CONFIGURATION ---
+  // 🚨 CRITICAL SECURITY WARNING: Your Pinata key is publicly exposed.
+  // You MUST go to Pinata, revoke your old key, and create a new one.
+  const PINATA_JWT = 'PASTE_YOUR_NEW_PINATA_JWT_HERE';
+
+  // --- DOM ELEMENT REFERENCES ---
+  const refugeeNameSpan = document.getElementById('refugee-name');
+  const fileInput = document.getElementById('fileUpload');
+  const docTypeSelect = document.getElementById('docType');
+  const walletAddressInput = document.getElementById('walletAddressInput');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const previewContainer = document.getElementById('previewContainer');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  // --- STATE MANAGEMENT ---
+  let selectedFile = null;
+
+  // --- INITIALIZATION ---
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get refugee name from a previous page
+    const urlParams = new URLSearchParams(window.location.search);
+    const refugeeName = urlParams.get('name') || 'Refugee';
+    refugeeNameSpan.textContent = refugeeName;
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    confirmBtn.addEventListener('click', handleConfirmAndUpload);
+  });
+
+  // --- FUNCTIONS ---
+  
+  /**
+   * Handles file selection, displays a preview, and enables the confirm button.
+   */
+  function handleFileSelect() {
+    previewContainer.innerHTML = '';
+    selectedFile = fileInput.files[0];
+    if (!selectedFile) {
+        confirmBtn.disabled = true;
+        return;
+    }
+    
+    confirmBtn.disabled = false; // Enable button as soon as file is selected
+
+    // Display preview
+    if (selectedFile.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(selectedFile);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      previewContainer.appendChild(img);
+    } else {
+      const fileNameDiv = document.createElement('div');
+      fileNameDiv.className = 'file-name';
+      fileNameDiv.textContent = selectedFile.name;
+      previewContainer.appendChild(fileNameDiv);
+    }
+    uploadStatus.textContent = `Selected: ${selectedFile.name}`;
+  }
+
+  /**
+   * Handles the final confirmation, uploads to IPFS, and redirects to the dashboard.
+   */
+  async function handleConfirmAndUpload() {
+    if (!selectedFile || !docTypeSelect.value) {
+      alert("Please select a document type and choose a file.");
+      return;
+    }
+
+    confirmBtn.textContent = 'Uploading to IPFS...';
+    confirmBtn.disabled = true;
+
+    const walletAddress = walletAddressInput.value.trim();
+
+    try {
+      const cid = await uploadToPinata(selectedFile, walletAddress, docTypeSelect.value);
+      
+      // On success, redirect to the dashboard with all necessary info
+      const params = new URLSearchParams();
+      params.set('name', refugeeNameSpan.textContent);
+      params.set('cid', cid);
+      if (walletAddress) {
+        params.set('wallet', walletAddress);
+      }
+      window.location.href = `../../../dashboard.html?${params.toString()}`;
+
+    } catch (error) {
+      alert(`Upload failed: ${error.message}`);
+      confirmBtn.textContent = 'Upload to IPFS & Go to Dashboard';
+      confirmBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Uploads the selected file to IPFS via Pinata with structured naming.
+   */
+  async function uploadToPinata(file, wallet, docType) {
+    // Use the wallet address for the filename, or a fallback if it's not provided
+    const refugeeName = refugeeNameSpan.textContent.replace(/\s+/g, '_');
+    const fallbackId = `${refugeeName}_${Date.now()}`;
+    const uniqueIdentifier = wallet || fallbackId;
+
+    const fileExtension = file.name.split('.').pop();
+    const structuredFilename = `${uniqueIdentifier}_${docType}.${fileExtension}`;
+
+    const data = new FormData();
+    data.append('file', file);
+
+    const metadata = JSON.stringify({
+      name: structuredFilename,
+      keyvalues: {
+        recordIdentifier: uniqueIdentifier // Custom metadata for easy querying
+      }
+    });
+    data.append('pinataMetadata', metadata);
+    
+    console.log(`Uploading ${structuredFilename} to IPFS...`);
+
+    try {
+        const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", data, {
+            headers: { 'Authorization': `Bearer ${PINATA_JWT}` }
+        });
+        console.log("Successfully stored on Pinata. CID:", res.data.IpfsHash);
+        return res.data.IpfsHash;
+    } catch (error) {
+        console.error("Error uploading to Pinata:", error.response ? error.response.data : error);
+        throw new Error("Failed to upload to IPFS. Check your Pinata JWT and permissions.");
+    }
+  }
+
+</script>
+
 </body>
 </html>
+
