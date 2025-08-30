@@ -1,48 +1,69 @@
-# dApp 🚀
+# SafeID: Decentralized Identity for Displaced Civilians 🌍
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Made with Solidity](https://img.shields.io/badge/Solidity-^0.8.0-black)](https://soliditylang.org/)  
-[![Web3](https://img.shields.io/badge/Web3.js-Ethereum-brightgreen)](https://web3js.readthedocs.io/) 
-[![Ethers](https://img.shields.io/badge/Ethers.js-Blockchain-yellow)](https://docs.ethers.io/)  
+[![IPFS](https://img.shields.io/badge/Storage-IPFS-orange)](https://ipfs.tech/)
+[![WebAuthn](https://img.shields.io/badge/Security-WebAuthn-green)](https://www.w3.org/TR/webauthn/)
+[![Pinata](https://img.shields.io/badge/Pinata-API-yellow)](https://www.pinata.cloud/)  
 
-A decentralized application (dApp) built using **Ethereum Blockchain**, **Solidity Smart Contracts**, and a modern frontend.  
-This project demonstrates how Web3 technology can be integrated into a user-friendly application for transparent, secure, and trustless interactions.
+SafeID is a **Web3-based decentralized application (dApp)** designed to provide a secure, portable, and tamper-proof digital identity for displaced civilians in crisis situations.  
+It ensures that individuals who have lost their documents can still **access humanitarian aid, cross borders, and restore their legal rights**.
 
 ---
 
-## 📌 Features
-- 🔗 Wallet connection (MetaMask / Coinbase / WalletConnect support)  
-- 📝 Interact with deployed smart contracts  
-- 💸 Send and receive transactions securely  
-- 📊 Display on-chain data in real time  
-- 🌐 Fully decentralized and censorship-resistant  
+## 🚨 The Problem
+During crises such as **conflicts, natural disasters, or mass displacement**, civilians often lose access to critical identification documents. Without proof of identity, they face immense challenges in:
+- Accessing essential services  
+- Crossing borders legally  
+- Reuniting with their families  
+
+Traditional identity systems are often:
+- Slow  
+- Centralized  
+- Vulnerable to loss or tampering  
+
+✅ **SafeID solves this by leveraging decentralized technologies** to create a **resilient, tamper-proof, and user-controlled identity system.**
 
 ---
 
 ## ⚙️ How It Works
-1. **Smart Contracts (Solidity)** – All business logic is handled on the blockchain (e.g., payments, ownership, or data storage).  
-2. **Frontend (React / HTML-CSS-JS)** – Provides a simple and intuitive interface for interacting with the blockchain.  
-3. **Web3 / Ethers.js Integration** – Connects the frontend with Ethereum nodes for contract interactions.  
-4. **Wallet Authentication** – Users authenticate and sign transactions directly from their crypto wallet.  
+SafeID follows a **two-step process** managed entirely by **aid workers** through a simple web interface. Refugees do not need technical knowledge.
 
-This ensures **security**, **transparency**, and **trustlessness** in every action.
+### 1. Identity Creation & Biometric Registration
+- Aid worker enters refugee details (name, nationality, etc.) and captures a photo.  
+- Using **Web Authentication API (WebAuthn)**, the system captures a biometric credential (e.g., fingerprint).  
+- A **cryptographic key pair** is generated at the device level.  
+- The identity package (**details, photo, and biometric key**) is uploaded to **IPFS** via **Pinata**, producing a **permanent Content ID (CID)**.  
+
+### 2. Document & Wallet Management
+- Aid worker uploads supporting documents (passports, certificates, etc.).  
+- Each document is stored on **IPFS**, named with a **unique identifier** (wallet address or generated ID).  
+- The **IPFS CID** serves as a globally verifiable pointer to the refugee’s identity and documents.  
 
 ---
 
-## 💡 Why This Project Can Help
-- 🧑‍🎓 **For Learners**: Understand how smart contracts interact with a frontend.  
-- 💼 **For Developers**: Use it as a boilerplate to build your own decentralized apps.  
-- 🔒 **For Users**: Benefit from a verifiable and decentralized system.  
+## ✨ Key Features
+- **Decentralized Storage** – Refugee data stored on **IPFS**, censorship-resistant and tamper-proof.  
+- **Biometric Security** – Uses **WebAuthn API** for fingerprint/biometric authentication.  
+- **User-Centric Design** – Refugees don’t need technical knowledge; aid workers handle everything.  
+- **Optional Wallet Integration** – Can link a crypto wallet but is not required.  
+- **Verifiable & Portable** – IPFS CIDs act as permanent proof of identity, usable worldwide.  
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Installation and Local Setup
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Adityaa-Kumarr/dApp.git
-cd dApp
+### ✅ Prerequisites
+- [Node.js](https://nodejs.org/) installed  
+- [Visual Studio Code](https://code.visualstudio.com/)  
+- **Live Server** extension for VS Code  
 
-```
+---
+
+### ⚡ Setup Steps
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Adityaa-Kumarr/dApp.git
+   cd dApp
+
 ##  Screenshot
 <img width="1434" height="725" alt="image" src="https://github.com/user-attachments/assets/b0b44b3b-5407-456a-8f02-081cedb0b4a5" />
