@@ -317,7 +317,7 @@
             <div id="cid-display" class="cid-info" style="display: none;">
                 <strong>IPFS CID:</strong> <span id="ipfs-cid"></span>
             </div>
-            <button id="close-modal-btn">Create Another ID</button>
+            <button id="close-modal-btn">View Identity</button>
         </div>
         
     </div>
@@ -484,6 +484,12 @@
         fingerprintCredential = null;
         checkFormReadiness();
         successModal.style.display = 'none';
+        // Redirect to upload page with CID & name
+        const name = form.querySelector('#name').value;
+        const cid = ipfsCidSpan.textContent;
+
+        // Pass data via query params
+        location.href = `upload/upload.html?name=${encodeURIComponent(name)}&cid=${encodeURIComponent(cid)}`;
     }
 
     // --- Camera Logic ---
