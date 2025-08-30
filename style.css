@@ -231,9 +231,7 @@ body {
     
   transform: scale(1.1);
 }
-.features .feature-grid{
-  flex: 1 1 450px;
-}
+
 .features h2 {
   font-size: 2.4rem;
   margin-bottom: 2.5rem;
@@ -245,6 +243,9 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+}
+.feature-grid .feature-card:hover{
+  transform:scale(1.1);
 }
 
 .feature-card {
