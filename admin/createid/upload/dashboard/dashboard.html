@@ -274,75 +274,39 @@
       });
 
       // --- MODIFIED PDF Download Functionality ---
-      const downloadBtn = document.getElementById('downloadPdfBtn');
-      downloadBtn.addEventListener('click', () => {
-          
-          // --- Provide user feedback ---
-          const originalBtnText = downloadBtn.textContent;
-          downloadBtn.textContent = 'Generating...';
-          downloadBtn.disabled = true;
+      const downloadBtn = document.getElementById("downloadPdfBtn");
+downloadBtn.addEventListener("click", () => {
+    const element = document.getElementById("flipCard");
+    const userNameForFile = document.getElementById("userName").textContent.trim().replace(/\s+/g, "_");
 
-          const cardFront = document.querySelector('.flip-card-front').cloneNode(true);
-          const cardBack = document.querySelector('.flip-card-back').cloneNode(true);
+    const options = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: `${userNameForFile}_SafeID_Card.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+    };
 
-          cardBack.style.transform = 'none';
-          cardBack.style.marginTop = '20px';
+    // Ensure images loaded before capture
+    const imgs = element.getElementsByTagName("img");
+    const promises = Array.from(imgs).map(img => new Promise((resolve, reject) => {
+        img.crossOrigin = "anonymous";
+        if (img.complete) resolve();
+        else {
+            img.onload = resolve;
+            img.onerror = reject;
+        }
+    }));
 
-          const pdfContainer = document.createElement('div');
-          pdfContainer.style.width = '480px';
-          pdfContainer.appendChild(cardFront);
-          pdfContainer.appendChild(cardBack);
-
-          pdfContainer.style.position = 'absolute';
-          pdfContainer.style.left = '-9999px';
-          document.body.appendChild(pdfContainer);
-          
-          const userNameForFile = document.getElementById('userName').textContent.trim().replace(/\s+/g, '_');
-          const options = {
-              margin:       [0.5, 0.5, 0.5, 0.5],
-              filename:     `${userNameForFile}_SafeID_Card.pdf`,
-              image:        { type: 'jpeg', quality: 0.98 },
-              // IMPORTANT: useCORS is critical for fetching external images
-              html2canvas:  { scale: 2, useCORS: true, allowTaint: true }, 
-              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-          };
-
-          // --- NEW: Wait for images to load before generating PDF ---
-          const images = pdfContainer.getElementsByTagName('img');
-          const promises = [];
-          for (let i = 0; i < images.length; i++) {
-              const img = images[i];
-              promises.push(new Promise((resolve, reject) => {
-                  // Set crossOrigin attribute to anonymous for CORS compatibility
-                  img.crossOrigin = 'anonymous'; 
-                  if (img.complete) {
-                      resolve();
-                  } else {
-                      img.onload = resolve;
-                      img.onerror = reject;
-                  }
-              }));
-          }
-
-          Promise.all(promises).then(() => {
-              // All images are loaded, now generate the PDF
-              html2pdf().from(pdfContainer).set(options).save().then(() => {
-                  // Cleanup
-                  document.body.removeChild(pdfContainer);
-                  // Restore button state
-                  downloadBtn.textContent = originalBtnText;
-                  downloadBtn.disabled = false;
-              });
-          }).catch((error) => {
-              console.error("Error loading images for PDF generation:", error);
-              alert("Could not download the card. An image failed to load.");
-              // Cleanup and restore button state
-              document.body.removeChild(pdfContainer);
-              downloadBtn.textContent = originalBtnText;
-              downloadBtn.disabled = false;
-          });
-      });
+    Promise.all(promises).then(() => {
+        // Capture visible card
+        return html2pdf().set(options).from(element).save();
+    }).catch(err => {
+        console.error("PDF generation failed:", err);
+        alert("Could not generate PDF. Try again.");
     });
+});
+});
 
     function populateProfile(name, email, phone, nationality, wallet) {
       document.getElementById('userName').textContent = name;
