@@ -98,11 +98,38 @@
   </section>
 
   <!-- Impact Section -->
-  <section id="impact" class="section">
-    <h2>The Impact</h2>
-    <p>SafeID restores dignity and independence for displaced civilians. 
-    <br></p>
-  </section>
+  <section class="impact-grid" id="impactSection">
+    
+  <div class="impact-card" >
+    <div class="icon">🛡️</div>
+    <h2>Security</h2>
+    <p>Blockchain ensures tamper-proof, secure digital identities for refugees.</p>
+  </div>
+
+  <div class="impact-card">
+    <div class="icon">🌐</div>
+    <h2>Accessibility</h2>
+    <p>Identities can be verified anywhere in the world, without physical documents.</p>
+  </div>
+
+  <div class="impact-card">
+    <div class="icon">🤝</div>
+    <h2>Trust</h2>
+    <p>Verifiable credentials from NGOs and aid agencies build instant trust.</p>
+  </div>
+
+  <div class="impact-card">
+    <div class="icon">⚡</div>
+    <h2>Efficiency</h2>
+    <p>Instant authentication at borders and aid distribution centers.</p>
+  </div>
+
+  <div class="impact-card">
+    <div class="icon">📈</div>
+    <h2>Empowerment</h2>
+    <p>Refugees regain control over their identity, rights, and future.</p>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer>
@@ -139,12 +166,25 @@
 </footer>
 <script src="index.js"></script>
   <script>
-  const hamburger = document.querySelector(".hamburger");
-  const navLinks = document.querySelector(".navbar ul");
+  // Animate impact cards on scroll
+const impactCards = document.querySelectorAll(".impact-card");
 
-  hamburger.addEventListener("click", () => {
-    navLinks.classList.toggle("show");
+function revealImpacts() {
+  const triggerBottom = window.innerHeight * 0.85;
+
+  impactCards.forEach(card => {
+    const cardTop = card.getBoundingClientRect().top;
+    if (cardTop < triggerBottom) {
+      card.style.opacity = "1";
+      card.style.transform = "translateY(0)";
+      card.style.transition = "all 0.6s ease-out";
+    }
   });
+}
+
+window.addEventListener("scroll", revealImpacts);
+window.addEventListener("load", revealImpacts);
+
 </script>
 
 </body>
