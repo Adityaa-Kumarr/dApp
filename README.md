@@ -1,4 +1,4 @@
-# SafeID: Decentralized Identity for Displaced Civilians 🌍
+# 🔐SafeID: Decentralized Identity for Displaced Civilians 🌍
 
 **Team Nexaid** - *Innovate-A-Thon 3.0*
 
@@ -123,7 +123,7 @@ This project utilizes a modern, lightweight tech stack designed for rapid develo
    - Your browser will open to the admin login page.
    - Use the credentials:
      - Username: `admin`
-     - Password: `password123`
+     - Password: `123`
 
 ✅ You can now use the application to create and manage refugee identities.
 
