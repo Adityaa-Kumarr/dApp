@@ -34,6 +34,9 @@ Traditional identity systems are often:
 
 ## ⚙️ How It Works
 
+-- Deployed Link
+- https://teamnexaid.netlify.app/
+
 SafeID follows a **two-step process** managed entirely by aid workers through a simple web interface. Refugees do not need technical knowledge.
 
 ### 1. Identity Creation & Biometric Registration
