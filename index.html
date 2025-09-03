@@ -6,6 +6,7 @@
   <title>SafeID -Decentralized Identity</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="icon" type="image/png" href="./assets/images/safeidlogo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
 </head>
 <!-- Ethers v5 -->
@@ -16,9 +17,10 @@
  <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="K2IlH8AAd49HhuSnB4we1";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
 </script>
-<script src="coinbase.js" defer></script>
+<script src="index.js" ></script>
 
 <body>
+ 
   <!-- Header -->
   <header class="navbar">
     <div class="logo">SafeID</div>
@@ -134,39 +136,54 @@
   </div>
 </section>
 
-  <!-- Footer -->
-  <footer>
-<section class="contact" id="contact"></section>
+  <!-- Footer --> <footer class="footer">
+    <div class="footer-container">
 
-  <div class="footer-container">
-    
-    <!-- Logo + Tagline -->
-    <div class="footer-logo">
-      <h3>SafeID</h3>
-      <img src="admin/createid/upload/safeidlogo.jpg" alt="SafeID Logo">
-      
-      <p>Identity Beyond Borders</p>
+      <!-- Logo & Tagline -->
+      <div class="footer-section">
+        <img src="admin/createid/upload/safeidlogo.jpg" alt="SafeID Logo" class="footer-logo">
+        <p class="footer-title">SafeID</p>
+        <p class="footer-text">Identity Beyond Borders</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Quick Links</h3>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Contact</h3>
+        <p><i class="fa fa-envelope"></i> support@safeid.com</p>
+        <p><i class="fa fa-phone"></i> +91 98765 43210</p>
+      </div>
+
+      <!-- Address & Social -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Address</h3>
+        <p><i class="fa fa-map-marker-alt"></i> Ranchi, Jharkhand, India</p>
+        <div class="social-icons">
+          <a href="https://www.linkedin.com/feed/"><i class="fab fa-linkedin"></i></a>
+          <a href="https://github.com"><i class="fab fa-github"></i></a>
+          <a href="https://x.com"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Contact Info -->
-    <div class="footer-contact">
-      <h4>Contact</h4>
-      <p>Email: <a href="mailto:support@safeid.com">support@safeid.com</a></p>
-      <p>Phone: +91 98765 43210</p>
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      © 2025 SafeID | Built for a Better Future
     </div>
+  </footer>
 
-    <!-- Address -->
-    <div class="footer-address">
-      <h4>Address</h4>
-      <p>Ranchi , Jharkhand,India</p>
-    </div>
-  </div>
 
-  <!-- Bottom bar -->
-  <div class="footer-bottom">
-    <p>© 2025 SafeID | Built for a Better Future</p>
-  </div>
-</footer>
 <script src="index.js"></script>
   <script>
   // Animate impact cards on scroll
